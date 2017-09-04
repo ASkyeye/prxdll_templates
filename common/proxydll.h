@@ -1,4 +1,8 @@
+#ifndef PROXYDLL_H
+#define PROXYDLL_H
 #pragma once
+
+#include <Windows.h>
 
 #ifdef PROXYDLL_CRYPTSP_EXPORTS
 #define DLL_FNAME "\\cryptsp.dll"
@@ -69,3 +73,4 @@
 BOOL real_dll_init(void);
 BOOL real_dll_free(void);
 FARPROC resolve_export_proc(size_t index);
+#endif

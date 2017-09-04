@@ -1,7 +1,7 @@
+#include "proxydll.h"
+
 #include <Windows.h>
 #include <tchar.h>
-
-#include "proxydll.h"
 
 static HMODULE hmod = NULL;
 static LPCSTR export_names[] = { 
