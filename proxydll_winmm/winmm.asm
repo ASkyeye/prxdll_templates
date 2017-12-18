@@ -1,5 +1,6 @@
 ifndef x64
-    .model flat
+    .model flat, stdcall
+	.safeseh SEH_handler
 endif
 
 .code
@@ -20,8 +21,6 @@ else
     push rdx
     push r8
     push r9
-    push r10
-    push r11
     sub rsp, 28h
 if index eq 0
     xor rcx, rcx
@@ -30,8 +29,6 @@ else
 endif
     call resolve_export_proc
     add rsp, 28h
-    pop r11
-    pop r10
     pop r9
     pop r8
     pop rdx
@@ -237,5 +234,10 @@ M_EXPORT_PROC tid32Message, 190
 M_EXPORT_PROC wid32Message, 191
 M_EXPORT_PROC wod32Message, 192
 endif
+
+SEH_handler   proc
+	; empty handler
+	ret
+SEH_handler   endp
 
 end

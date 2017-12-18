@@ -1,31 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\common\dllmain.c">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\proxydll.c">
-      <Filter>common</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="winmm.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <MASM Include="winmm.asm" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="winmm_x64.def" />
-    <None Include="winmm_x86.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="common">
-      <UniqueIdentifier>{e3b33302-1dfe-4546-83d3-97086c343e03}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b195dfc0-ee5d-4182-b8fc-87a5e5135c60}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{b59e08b7-8118-48a0-ae9b-0dbca8ef6f1f}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{87523278-7cdd-45f1-b973-db5e5090cf15}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\proxydll.h">
-      <Filter>common</Filter>
+    <MASM Include="winmm.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="proxydll.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="winmm_x64.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="winmm_x86.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="proxydll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="version.asm">
+    <MASM Include="wtsapi32.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
@@ -31,7 +31,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="version.def">
+    <None Include="wtsapi32.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
