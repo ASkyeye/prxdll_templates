@@ -1,39 +1,39 @@
 ifndef x64
-    .model flat, stdcall
-	.safeseh SEH_handler
+        .model flat, stdcall
+        .safeseh SEH_handler
 endif
 
 .code
 
 ifndef x64
-    resolve_export_proc proto C, arg1:dword
+        resolve_export_proc proto C, arg1:dword
 else
-    extern resolve_export_proc:proc
+        extern resolve_export_proc:proc
 endif
 
 M_EXPORT_PROC macro export, index
 export proc
 ifndef x64
-    invoke resolve_export_proc, index
-    jmp dword ptr eax
+        invoke resolve_export_proc, index
+        jmp dword ptr eax
 else
-    push rcx
-    push rdx
-    push r8
-    push r9
-    sub rsp, 28h
+        push rcx
+        push rdx
+        push r8
+        push r9
+        sub rsp, 28h
 if index eq 0
-    xor rcx, rcx
+        xor rcx, rcx
 else
-    mov rcx, index
+        mov rcx, index
 endif
-    call resolve_export_proc
-    add rsp, 28h
-    pop r9
-    pop r8
-    pop rdx
-    pop rcx
-    jmp qword ptr rax
+        call resolve_export_proc
+        add rsp, 28h
+        pop r9
+        pop r8
+        pop rdx
+        pop rcx
+        jmp qword ptr rax
 endif
 export endp
 endm
@@ -180,8 +180,8 @@ M_EXPORT_PROC _WinStationUpdateUserConfig, 138
 M_EXPORT_PROC _WinStationWaitForConnect, 139
 
 SEH_handler   proc
-	; empty handler
-	ret
+        ; empty handler
+        ret
 SEH_handler   endp
 
 end
