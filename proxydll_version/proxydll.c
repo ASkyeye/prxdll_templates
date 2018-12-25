@@ -15,7 +15,6 @@ FARPROC __stdcall find_real_function(WORD wOrdinal)
         LPCSTR ModuleName;
         DWORD *Names;
         WORD *NameOrdinals;
-        LPCSTR ProcName;
 
         if ( !wOrdinal )
                 return NULL;
@@ -50,7 +49,6 @@ FARPROC __stdcall find_real_function(WORD wOrdinal)
                 pExportDirectory->AddressOfNameOrdinals);
         Names = OffsetToPointer(pDosHeader,
                 pExportDirectory->AddressOfNames);
-        ProcName = MAKEINTRESOURCEA(wOrdinal);
 
         for ( DWORD i = 0; i < pExportDirectory->NumberOfNames; ++i ) {
                 if ( wOrdinal != pExportDirectory->Base + NameOrdinals[i] )
