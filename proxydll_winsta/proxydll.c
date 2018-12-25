@@ -19,11 +19,14 @@ FARPROC __stdcall find_real_function(WORD wOrdinal)
         if ( !wOrdinal )
                 return NULL;
 
-        pDosHeader = (PIMAGE_DOS_HEADER)&__ImageBase;
+        pDosHeader = &__ImageBase;
         if ( pDosHeader->e_magic != IMAGE_DOS_SIGNATURE )
                 return NULL;
 
         pNtHeader = OffsetToPointer(pDosHeader, pDosHeader->e_lfanew);
+        if ( pNtHeader->Signature != IMAGE_NT_SIGNATURE )
+                return NULL;
+
         pExportDirectory = OffsetToPointer(pDosHeader,
                 pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 
