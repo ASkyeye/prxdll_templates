@@ -1,243 +1,246 @@
-ifndef x64
-        .model flat, stdcall
-        .safeseh SEH_handler
-endif
+IFNDEF x64
+        .MODEL FLAT, STDCALL
+        .SAFESEH SEH_handler
+ENDIF
 
-.code
+.CODE
 
-ifndef x64
-        resolve_export_proc proto C, arg1:dword
-else
-        extern resolve_export_proc:proc
-endif
+IFNDEF x64
+        find_real_function PROTO STDCALL, arg1:WORD
+ELSE
+        EXTERN find_real_function:PROC
+ENDIF
 
-M_EXPORT_PROC macro export, index
-export proc
-ifndef x64
-        invoke resolve_export_proc, index
-        jmp dword ptr eax
-else
-        push rcx
-        push rdx
-        push r8
-        push r9
-        sub rsp, 28h
-if index eq 0
-        xor rcx, rcx
-else
-        mov rcx, index
-endif
-        call resolve_export_proc
-        add rsp, 28h
-        pop r9
-        pop r8
-        pop rdx
-        pop rcx
-        jmp qword ptr rax
-endif
-export endp
-endm
+export MACRO name, x, y
+IFNDEF x64 AND x NE 0
+    name PROC
+            INVOKE find_real_function, x
+            test eax, eax
+            jz bye
+            jmp dword ptr eax
+    bye:
+            ret
+    name ENDP
+ELSEIFDEF x64 AND y NE 0
+    name PROC
+            push rcx
+            push rdx
+            push r8
+            push r9
+            sub rsp, 28h
+            mov rcx, y
+            call find_real_function
+            add rsp, 28h
+            pop r9
+            pop r8
+            pop rdx
+            pop rcx
+            test rax, rax
+            jz bye
+            jmp qword ptr rax
+    bye:    
+            ret
+    name ENDP
+ENDIF
+ENDM
 
-M_EXPORT_PROC WINMM_2, 0
-M_EXPORT_PROC CloseDriver, 1
-M_EXPORT_PROC DefDriverProc, 2
-M_EXPORT_PROC DriverCallback, 3
-M_EXPORT_PROC DrvGetModuleHandle, 4
-M_EXPORT_PROC GetDriverModuleHandle, 5
-M_EXPORT_PROC OpenDriver, 6
-M_EXPORT_PROC PlaySound, 7
-M_EXPORT_PROC PlaySoundA, 8
-M_EXPORT_PROC PlaySoundW, 9
-M_EXPORT_PROC SendDriverMessage, 10
-M_EXPORT_PROC WOWAppExit, 11
-M_EXPORT_PROC auxGetDevCapsA, 12
-M_EXPORT_PROC auxGetDevCapsW, 13
-M_EXPORT_PROC auxGetNumDevs, 14
-M_EXPORT_PROC auxGetVolume, 15
-M_EXPORT_PROC auxOutMessage, 16
-M_EXPORT_PROC auxSetVolume, 17
-M_EXPORT_PROC joyConfigChanged, 18
-M_EXPORT_PROC joyGetDevCapsA, 19
-M_EXPORT_PROC joyGetDevCapsW, 20
-M_EXPORT_PROC joyGetNumDevs, 21
-M_EXPORT_PROC joyGetPos, 22
-M_EXPORT_PROC joyGetPosEx, 23
-M_EXPORT_PROC joyGetThreshold, 24
-M_EXPORT_PROC joyReleaseCapture, 25
-M_EXPORT_PROC joySetCapture, 26
-M_EXPORT_PROC joySetThreshold, 27
-M_EXPORT_PROC mciDriverNotify, 28
-M_EXPORT_PROC mciDriverYield, 29
-M_EXPORT_PROC mciExecute, 30
-M_EXPORT_PROC mciFreeCommandResource, 31
-M_EXPORT_PROC mciGetCreatorTask, 32
-M_EXPORT_PROC mciGetDeviceIDA, 33
-M_EXPORT_PROC mciGetDeviceIDFromElementIDA, 34
-M_EXPORT_PROC mciGetDeviceIDFromElementIDW, 35
-M_EXPORT_PROC mciGetDeviceIDW, 36
-M_EXPORT_PROC mciGetDriverData, 37
-M_EXPORT_PROC mciGetErrorStringA, 38
-M_EXPORT_PROC mciGetErrorStringW, 39
-M_EXPORT_PROC mciGetYieldProc, 40
-M_EXPORT_PROC mciLoadCommandResource, 41
-M_EXPORT_PROC mciSendCommandA, 42
-M_EXPORT_PROC mciSendCommandW, 43
-M_EXPORT_PROC mciSendStringA, 44
-M_EXPORT_PROC mciSendStringW, 45
-M_EXPORT_PROC mciSetDriverData, 46
-M_EXPORT_PROC mciSetYieldProc, 47
-M_EXPORT_PROC midiConnect, 48
-M_EXPORT_PROC midiDisconnect, 49
-M_EXPORT_PROC midiInAddBuffer, 50
-M_EXPORT_PROC midiInClose, 51
-M_EXPORT_PROC midiInGetDevCapsA, 52
-M_EXPORT_PROC midiInGetDevCapsW, 53
-M_EXPORT_PROC midiInGetErrorTextA, 54
-M_EXPORT_PROC midiInGetErrorTextW, 55
-M_EXPORT_PROC midiInGetID, 56
-M_EXPORT_PROC midiInGetNumDevs, 57
-M_EXPORT_PROC midiInMessage, 58
-M_EXPORT_PROC midiInOpen, 59
-M_EXPORT_PROC midiInPrepareHeader, 60
-M_EXPORT_PROC midiInReset, 61
-M_EXPORT_PROC midiInStart, 62
-M_EXPORT_PROC midiInStop, 63
-M_EXPORT_PROC midiInUnprepareHeader, 64
-M_EXPORT_PROC midiOutCacheDrumPatches, 65
-M_EXPORT_PROC midiOutCachePatches, 66
-M_EXPORT_PROC midiOutClose, 67
-M_EXPORT_PROC midiOutGetDevCapsA, 68
-M_EXPORT_PROC midiOutGetDevCapsW, 69
-M_EXPORT_PROC midiOutGetErrorTextA, 70
-M_EXPORT_PROC midiOutGetErrorTextW, 71
-M_EXPORT_PROC midiOutGetID, 72
-M_EXPORT_PROC midiOutGetNumDevs, 73
-M_EXPORT_PROC midiOutGetVolume, 74
-M_EXPORT_PROC midiOutLongMsg, 75
-M_EXPORT_PROC midiOutMessage, 76
-M_EXPORT_PROC midiOutOpen, 77
-M_EXPORT_PROC midiOutPrepareHeader, 78
-M_EXPORT_PROC midiOutReset, 79
-M_EXPORT_PROC midiOutSetVolume, 80
-M_EXPORT_PROC midiOutShortMsg, 81
-M_EXPORT_PROC midiOutUnprepareHeader, 82
-M_EXPORT_PROC midiStreamClose, 83
-M_EXPORT_PROC midiStreamOpen, 84
-M_EXPORT_PROC midiStreamOut, 85
-M_EXPORT_PROC midiStreamPause, 86
-M_EXPORT_PROC midiStreamPosition, 87
-M_EXPORT_PROC midiStreamProperty, 88
-M_EXPORT_PROC midiStreamRestart, 89
-M_EXPORT_PROC midiStreamStop, 90
-M_EXPORT_PROC mixerClose, 91
-M_EXPORT_PROC mixerGetControlDetailsA, 92
-M_EXPORT_PROC mixerGetControlDetailsW, 93
-M_EXPORT_PROC mixerGetDevCapsA, 94
-M_EXPORT_PROC mixerGetDevCapsW, 95
-M_EXPORT_PROC mixerGetID, 96
-M_EXPORT_PROC mixerGetLineControlsA, 97
-M_EXPORT_PROC mixerGetLineControlsW, 98
-M_EXPORT_PROC mixerGetLineInfoA, 99
-M_EXPORT_PROC mixerGetLineInfoW, 100
-M_EXPORT_PROC mixerGetNumDevs, 101
-M_EXPORT_PROC mixerMessage, 102
-M_EXPORT_PROC mixerOpen, 103
-M_EXPORT_PROC mixerSetControlDetails, 104
-M_EXPORT_PROC mmDrvInstall, 105
-M_EXPORT_PROC mmGetCurrentTask, 106
-M_EXPORT_PROC mmTaskBlock, 107
-M_EXPORT_PROC mmTaskCreate, 108
-M_EXPORT_PROC mmTaskSignal, 109
-M_EXPORT_PROC mmTaskYield, 110
-M_EXPORT_PROC mmioAdvance, 111
-M_EXPORT_PROC mmioAscend, 112
-M_EXPORT_PROC mmioClose, 113
-M_EXPORT_PROC mmioCreateChunk, 114
-M_EXPORT_PROC mmioDescend, 115
-M_EXPORT_PROC mmioFlush, 116
-M_EXPORT_PROC mmioGetInfo, 117
-M_EXPORT_PROC mmioInstallIOProcA, 118
-M_EXPORT_PROC mmioInstallIOProcW, 119
-M_EXPORT_PROC mmioOpenA, 120
-M_EXPORT_PROC mmioOpenW, 121
-M_EXPORT_PROC mmioRead, 122
-M_EXPORT_PROC mmioRenameA, 123
-M_EXPORT_PROC mmioRenameW, 124
-M_EXPORT_PROC mmioSeek, 125
-M_EXPORT_PROC mmioSendMessage, 126
-M_EXPORT_PROC mmioSetBuffer, 127
-M_EXPORT_PROC mmioSetInfo, 128
-M_EXPORT_PROC mmioStringToFOURCCA, 129
-M_EXPORT_PROC mmioStringToFOURCCW, 130
-M_EXPORT_PROC mmioWrite, 131
-M_EXPORT_PROC mmsystemGetVersion, 132
-M_EXPORT_PROC sndPlaySoundA, 133
-M_EXPORT_PROC sndPlaySoundW, 134
-M_EXPORT_PROC timeBeginPeriod, 135
-M_EXPORT_PROC timeEndPeriod, 136
-M_EXPORT_PROC timeGetDevCaps, 137
-M_EXPORT_PROC timeGetSystemTime, 138
-M_EXPORT_PROC timeGetTime, 139
-M_EXPORT_PROC timeKillEvent, 140
-M_EXPORT_PROC timeSetEvent, 141
-M_EXPORT_PROC waveInAddBuffer, 142
-M_EXPORT_PROC waveInClose, 143
-M_EXPORT_PROC waveInGetDevCapsA, 144
-M_EXPORT_PROC waveInGetDevCapsW, 145
-M_EXPORT_PROC waveInGetErrorTextA, 146
-M_EXPORT_PROC waveInGetErrorTextW, 147
-M_EXPORT_PROC waveInGetID, 148
-M_EXPORT_PROC waveInGetNumDevs, 149
-M_EXPORT_PROC waveInGetPosition, 150
-M_EXPORT_PROC waveInMessage, 151
-M_EXPORT_PROC waveInOpen, 152
-M_EXPORT_PROC waveInPrepareHeader, 153
-M_EXPORT_PROC waveInReset, 154
-M_EXPORT_PROC waveInStart, 155
-M_EXPORT_PROC waveInStop, 156
-M_EXPORT_PROC waveInUnprepareHeader, 157
-M_EXPORT_PROC waveOutBreakLoop, 158
-M_EXPORT_PROC waveOutClose, 159
-M_EXPORT_PROC waveOutGetDevCapsA, 160
-M_EXPORT_PROC waveOutGetDevCapsW, 161
-M_EXPORT_PROC waveOutGetErrorTextA, 162
-M_EXPORT_PROC waveOutGetErrorTextW, 163
-M_EXPORT_PROC waveOutGetID, 164
-M_EXPORT_PROC waveOutGetNumDevs, 165
-M_EXPORT_PROC waveOutGetPitch, 166
-M_EXPORT_PROC waveOutGetPlaybackRate, 167
-M_EXPORT_PROC waveOutGetPosition, 168
-M_EXPORT_PROC waveOutGetVolume, 169
-M_EXPORT_PROC waveOutMessage, 170
-M_EXPORT_PROC waveOutOpen, 171
-M_EXPORT_PROC waveOutPause, 172
-M_EXPORT_PROC waveOutPrepareHeader, 173
-M_EXPORT_PROC waveOutReset, 174
-M_EXPORT_PROC waveOutRestart, 175
-M_EXPORT_PROC waveOutSetPitch, 176
-M_EXPORT_PROC waveOutSetPlaybackRate, 177
-M_EXPORT_PROC waveOutSetVolume, 178
-M_EXPORT_PROC waveOutUnprepareHeader, 179
-M_EXPORT_PROC waveOutWrite, 180
+export WINMM_2, 2, 2
+export CloseDriver, 3, 3
+export DefDriverProc, 4, 4
+export DriverCallback, 5, 5
+export DrvGetModuleHandle, 6, 6
+export GetDriverModuleHandle, 7, 7
+export NotifyCallbackData, 8, 0
+export OpenDriver, 9, 8
+export PlaySound, 10, 9
+export PlaySoundA, 11, 10
+export PlaySoundW, 12, 11
+export SendDriverMessage, 13, 12
+export WOW32DriverCallback, 14, 0
+export WOW32ResolveMultiMediaHandle, 15, 0
+export WOWAppExit, 16, 13
+export aux32Message, 17, 0
+export auxGetDevCapsA, 18, 14
+export auxGetDevCapsW, 19, 15
+export auxGetNumDevs, 20, 16
+export auxGetVolume, 21, 17
+export auxOutMessage, 22, 18
+export auxSetVolume, 23, 19
+export joy32Message, 24, 0
+export joyConfigChanged, 25, 20
+export joyGetDevCapsA, 26, 21
+export joyGetDevCapsW, 27, 22
+export joyGetNumDevs, 28, 23
+export joyGetPos, 29, 24
+export joyGetPosEx, 30, 25
+export joyGetThreshold, 31, 26
+export joyReleaseCapture, 32, 27
+export joySetCapture, 33, 28
+export joySetThreshold, 34, 29
+export mci32Message, 35, 0
+export mciDriverNotify, 36, 30
+export mciDriverYield, 37, 31
+export mciExecute, 38, 32
+export mciFreeCommandResource, 39, 33
+export mciGetCreatorTask, 40, 34
+export mciGetDeviceIDA, 41, 35
+export mciGetDeviceIDFromElementIDA, 42, 36
+export mciGetDeviceIDFromElementIDW, 43, 37
+export mciGetDeviceIDW, 44, 38
+export mciGetDriverData, 45, 39
+export mciGetErrorStringA, 46, 40
+export mciGetErrorStringW, 47, 41
+export mciGetYieldProc, 48, 42
+export mciLoadCommandResource, 49, 43
+export mciSendCommandA, 50, 44
+export mciSendCommandW, 51, 45
+export mciSendStringA, 52, 46
+export mciSendStringW, 53, 47
+export mciSetDriverData, 54, 48
+export mciSetYieldProc, 55, 49
+export mid32Message, 56, 0
+export midiConnect, 57, 50
+export midiDisconnect, 58, 51
+export midiInAddBuffer, 59, 52
+export midiInClose, 60, 53
+export midiInGetDevCapsA, 61, 54
+export midiInGetDevCapsW, 62, 55
+export midiInGetErrorTextA, 63, 56
+export midiInGetErrorTextW, 64, 57
+export midiInGetID, 65, 58
+export midiInGetNumDevs, 66, 59
+export midiInMessage, 67, 60
+export midiInOpen, 68, 61
+export midiInPrepareHeader, 69, 62
+export midiInReset, 70, 63
+export midiInStart, 71, 64
+export midiInStop, 72, 65
+export midiInUnprepareHeader, 73, 66
+export midiOutCacheDrumPatches, 74, 67
+export midiOutCachePatches, 75, 68
+export midiOutClose, 76, 69
+export midiOutGetDevCapsA, 77, 70
+export midiOutGetDevCapsW, 78, 71
+export midiOutGetErrorTextA, 79, 72
+export midiOutGetErrorTextW, 80, 73
+export midiOutGetID, 81, 74
+export midiOutGetNumDevs, 82, 75
+export midiOutGetVolume, 83, 76
+export midiOutLongMsg, 84, 77
+export midiOutMessage, 85, 78
+export midiOutOpen, 86, 79
+export midiOutPrepareHeader, 87, 80
+export midiOutReset, 88, 81
+export midiOutSetVolume, 89, 82
+export midiOutShortMsg, 90, 83
+export midiOutUnprepareHeader, 91, 84
+export midiStreamClose, 92, 85
+export midiStreamOpen, 93, 86
+export midiStreamOut, 94, 87
+export midiStreamPause, 95, 88
+export midiStreamPosition, 96, 89
+export midiStreamProperty, 97, 90
+export midiStreamRestart, 98, 91
+export midiStreamStop, 99, 92
+export mixerClose, 100, 93
+export mixerGetControlDetailsA, 101, 94
+export mixerGetControlDetailsW, 102, 95
+export mixerGetDevCapsA, 103, 96
+export mixerGetDevCapsW, 104, 97
+export mixerGetID, 105, 98
+export mixerGetLineControlsA, 106, 99
+export mixerGetLineControlsW, 107, 100
+export mixerGetLineInfoA, 108, 101
+export mixerGetLineInfoW, 109, 102
+export mixerGetNumDevs, 110, 103
+export mixerMessage, 111, 104
+export mixerOpen, 112, 105
+export mixerSetControlDetails, 113, 106
+export mmDrvInstall, 114, 107
+export mmGetCurrentTask, 115, 108
+export mmTaskBlock, 116, 109
+export mmTaskCreate, 117, 110
+export mmTaskSignal, 118, 111
+export mmTaskYield, 119, 112
+export mmioAdvance, 120, 113
+export mmioAscend, 121, 114
+export mmioClose, 122, 115
+export mmioCreateChunk, 123, 116
+export mmioDescend, 124, 117
+export mmioFlush, 125, 118
+export mmioGetInfo, 126, 119
+export mmioInstallIOProcA, 127, 120
+export mmioInstallIOProcW, 128, 121
+export mmioOpenA, 129, 122
+export mmioOpenW, 130, 123
+export mmioRead, 131, 124
+export mmioRenameA, 132, 125
+export mmioRenameW, 133, 126
+export mmioSeek, 134, 127
+export mmioSendMessage, 135, 128
+export mmioSetBuffer, 136, 129
+export mmioSetInfo, 137, 130
+export mmioStringToFOURCCA, 138, 131
+export mmioStringToFOURCCW, 139, 132
+export mmioWrite, 140, 133
+export mmsystemGetVersion, 141, 134
+export mod32Message, 142, 0
+export mxd32Message, 143, 0
+export sndPlaySoundA, 144, 135
+export sndPlaySoundW, 145, 136
+export tid32Message, 146, 0
+export timeBeginPeriod, 147, 137
+export timeEndPeriod, 148, 138
+export timeGetDevCaps, 149, 139
+export timeGetSystemTime, 150, 140
+export timeGetTime, 151, 141
+export timeKillEvent, 152, 142
+export timeSetEvent, 153, 143
+export waveInAddBuffer, 154, 144
+export waveInClose, 155, 145
+export waveInGetDevCapsA, 156, 146
+export waveInGetDevCapsW, 157, 147
+export waveInGetErrorTextA, 158, 148
+export waveInGetErrorTextW, 159, 149
+export waveInGetID, 160, 150
+export waveInGetNumDevs, 161, 151
+export waveInGetPosition, 162, 152
+export waveInMessage, 163, 153
+export waveInOpen, 164, 154
+export waveInPrepareHeader, 165, 155
+export waveInReset, 166, 156
+export waveInStart, 167, 157
+export waveInStop, 168, 158
+export waveInUnprepareHeader, 169, 159
+export waveOutBreakLoop, 170, 160
+export waveOutClose, 171, 161
+export waveOutGetDevCapsA, 172, 162
+export waveOutGetDevCapsW, 173, 163
+export waveOutGetErrorTextA, 174, 164
+export waveOutGetErrorTextW, 175, 165
+export waveOutGetID, 176, 166
+export waveOutGetNumDevs, 177, 167
+export waveOutGetPitch, 178, 168
+export waveOutGetPlaybackRate, 179, 169
+export waveOutGetPosition, 180, 170
+export waveOutGetVolume, 181, 171
+export waveOutMessage, 182, 172
+export waveOutOpen, 183, 173
+export waveOutPause, 184, 174
+export waveOutPrepareHeader, 185, 175
+export waveOutReset, 186, 176
+export waveOutRestart, 187, 177
+export waveOutSetPitch, 188, 178
+export waveOutSetPlaybackRate, 189, 179
+export waveOutSetVolume, 190, 180
+export waveOutUnprepareHeader, 191, 181
+export waveOutWrite, 192, 182
+export wid32Message, 193, 0
+export wod32Message, 194, 0
 
-ifndef x64
-M_EXPORT_PROC NotifyCallbackData, 181
-M_EXPORT_PROC WOW32DriverCallback, 182
-M_EXPORT_PROC WOW32ResolveMultiMediaHandle, 183
-M_EXPORT_PROC aux32Message, 184
-M_EXPORT_PROC joy32Message, 185
-M_EXPORT_PROC mci32Message, 186
-M_EXPORT_PROC mid32Message, 187
-M_EXPORT_PROC mod32Message, 188
-M_EXPORT_PROC mxd32Message, 189
-M_EXPORT_PROC tid32Message, 190
-M_EXPORT_PROC wid32Message, 191
-M_EXPORT_PROC wod32Message, 192
-endif
-
-SEH_handler   proc
+SEH_handler PROC
         ; empty handler
         ret
-SEH_handler   endp
+SEH_handler ENDP
 
-end
+END

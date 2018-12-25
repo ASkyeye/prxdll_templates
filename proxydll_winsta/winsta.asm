@@ -1,187 +1,193 @@
-ifndef x64
-        .model flat, stdcall
-        .safeseh SEH_handler
-endif
+IFNDEF x64
+        .MODEL FLAT, STDCALL
+        .SAFESEH SEH_handler
+ENDIF
 
-.code
+.CODE
 
-ifndef x64
-        resolve_export_proc proto C, arg1:dword
-else
-        extern resolve_export_proc:proc
-endif
+IFNDEF x64
+        find_real_function PROTO STDCALL, arg1:WORD
+ELSE
+        EXTERN find_real_function:PROC
+ENDIF
 
-M_EXPORT_PROC macro export, index
-export proc
-ifndef x64
-        invoke resolve_export_proc, index
-        jmp dword ptr eax
-else
-        push rcx
-        push rdx
-        push r8
-        push r9
-        sub rsp, 28h
-if index eq 0
-        xor rcx, rcx
-else
-        mov rcx, index
-endif
-        call resolve_export_proc
-        add rsp, 28h
-        pop r9
-        pop r8
-        pop rdx
-        pop rcx
-        jmp qword ptr rax
-endif
-export endp
-endm
+export MACRO name, x, y
+IFNDEF x64 AND x NE 0
+    name PROC
+            INVOKE find_real_function, x
+            test eax, eax
+            jz bye
+            jmp dword ptr eax
+    bye:
+            ret
+    name ENDP
+ELSEIFDEF x64 AND y NE 0
+    name PROC
+            push rcx
+            push rdx
+            push r8
+            push r9
+            sub rsp, 28h
+            mov rcx, y
+            call find_real_function
+            add rsp, 28h
+            pop r9
+            pop r8
+            pop rdx
+            pop rcx
+            test rax, rax
+            jz bye
+            jmp qword ptr rax
+    bye:    
+            ret
+    name ENDP
+ENDIF
+ENDM
 
-M_EXPORT_PROC LogonIdFromWinStationNameA, 0
-M_EXPORT_PROC LogonIdFromWinStationNameW, 1
-M_EXPORT_PROC RemoteAssistancePrepareSystemRestore, 2
-M_EXPORT_PROC ServerGetInternetConnectorStatus, 3
-M_EXPORT_PROC ServerLicensingClose, 4
-M_EXPORT_PROC ServerLicensingDeactivateCurrentPolicy, 5
-M_EXPORT_PROC ServerLicensingFreePolicyInformation, 6
-M_EXPORT_PROC ServerLicensingGetAvailablePolicyIds, 7
-M_EXPORT_PROC ServerLicensingGetPolicy, 8
-M_EXPORT_PROC ServerLicensingGetPolicyInformationA, 9
-M_EXPORT_PROC ServerLicensingGetPolicyInformationW, 10
-M_EXPORT_PROC ServerLicensingLoadPolicy, 11
-M_EXPORT_PROC ServerLicensingOpenA, 12
-M_EXPORT_PROC ServerLicensingOpenW, 13
-M_EXPORT_PROC ServerLicensingSetPolicy, 14
-M_EXPORT_PROC ServerLicensingUnloadPolicy, 15
-M_EXPORT_PROC ServerQueryInetConnectorInformationA, 16
-M_EXPORT_PROC ServerQueryInetConnectorInformationW, 17
-M_EXPORT_PROC ServerSetInternetConnectorStatus, 18
-M_EXPORT_PROC WinStationActivateLicense, 19
-M_EXPORT_PROC WinStationAutoReconnect, 20
-M_EXPORT_PROC WinStationBroadcastSystemMessage, 21
-M_EXPORT_PROC WinStationCheckAccess, 22
-M_EXPORT_PROC WinStationCheckLoopBack, 23
-M_EXPORT_PROC WinStationCloseServer, 24
-M_EXPORT_PROC WinStationConnectA, 25
-M_EXPORT_PROC WinStationConnectCallback, 26
-M_EXPORT_PROC WinStationConnectEx, 27
-M_EXPORT_PROC WinStationConnectW, 28
-M_EXPORT_PROC WinStationDisconnect, 29
-M_EXPORT_PROC WinStationEnumerateA, 30
-M_EXPORT_PROC WinStationEnumerateExW, 31
-M_EXPORT_PROC WinStationEnumerateLicenses, 32
-M_EXPORT_PROC WinStationEnumerateProcesses, 33
-M_EXPORT_PROC WinStationEnumerateW, 34
-M_EXPORT_PROC WinStationEnumerate_IndexedA, 35
-M_EXPORT_PROC WinStationEnumerate_IndexedW, 36
-M_EXPORT_PROC WinStationFreeConsoleNotification, 37
-M_EXPORT_PROC WinStationFreeGAPMemory, 38
-M_EXPORT_PROC WinStationFreeMemory, 39
-M_EXPORT_PROC WinStationFreePropertyValue, 40
-M_EXPORT_PROC WinStationFreeUserCertificates, 41
-M_EXPORT_PROC WinStationFreeUserCredentials, 42
-M_EXPORT_PROC WinStationGenerateLicense, 43
-M_EXPORT_PROC WinStationGetAllProcesses, 44
-M_EXPORT_PROC WinStationGetAllSessionsW, 45
-M_EXPORT_PROC WinStationGetConnectionProperty, 46
-M_EXPORT_PROC WinStationGetDeviceId, 47
-M_EXPORT_PROC WinStationGetInitialApplication, 48
-M_EXPORT_PROC WinStationGetLanAdapterNameA, 49
-M_EXPORT_PROC WinStationGetLanAdapterNameW, 50
-M_EXPORT_PROC WinStationGetLoggedOnCount, 51
-M_EXPORT_PROC WinStationGetMachinePolicy, 52
-M_EXPORT_PROC WinStationGetProcessSid, 53
-M_EXPORT_PROC WinStationGetRestrictedLogonInfo, 54
-M_EXPORT_PROC WinStationGetSessionIds, 55
-M_EXPORT_PROC WinStationGetTermSrvCountersValue, 56
-M_EXPORT_PROC WinStationGetUserCertificates, 57
-M_EXPORT_PROC WinStationGetUserCredentials, 58
-M_EXPORT_PROC WinStationGetUserProfile, 59
-M_EXPORT_PROC WinStationInstallLicense, 60
-M_EXPORT_PROC WinStationIsHelpAssistantSession, 61
-M_EXPORT_PROC WinStationIsSessionPermitted, 62
-M_EXPORT_PROC WinStationIsSessionRemoteable, 63
-M_EXPORT_PROC WinStationNameFromLogonIdA, 64
-M_EXPORT_PROC WinStationNameFromLogonIdW, 65
-M_EXPORT_PROC WinStationNegotiateSession, 66
-M_EXPORT_PROC WinStationNtsdDebug, 67
-M_EXPORT_PROC WinStationOpenServerA, 68
-M_EXPORT_PROC WinStationOpenServerExA, 69
-M_EXPORT_PROC WinStationOpenServerExW, 70
-M_EXPORT_PROC WinStationOpenServerW, 71
-M_EXPORT_PROC WinStationQueryAllowConcurrentConnections, 72
-M_EXPORT_PROC WinStationQueryEnforcementCore, 73
-M_EXPORT_PROC WinStationQueryInformationA, 74
-M_EXPORT_PROC WinStationQueryInformationW, 75
-M_EXPORT_PROC WinStationQueryLicense, 76
-M_EXPORT_PROC WinStationQueryLogonCredentialsW, 77
-M_EXPORT_PROC WinStationQuerySessionVirtualIP, 78
-M_EXPORT_PROC WinStationQueryUpdateRequired, 79
-M_EXPORT_PROC WinStationRedirectErrorMessage, 80
-M_EXPORT_PROC WinStationRedirectLogonBeginPainting, 81
-M_EXPORT_PROC WinStationRedirectLogonError, 82
-M_EXPORT_PROC WinStationRedirectLogonMessage, 83
-M_EXPORT_PROC WinStationRedirectLogonStatus, 84
-M_EXPORT_PROC WinStationRegisterConsoleNotification, 85
-M_EXPORT_PROC WinStationRegisterConsoleNotificationEx, 86
-M_EXPORT_PROC WinStationRegisterNotificationEvent, 87
-M_EXPORT_PROC WinStationRemoveLicense, 88
-M_EXPORT_PROC WinStationRenameA, 89
-M_EXPORT_PROC WinStationRenameW, 90
-M_EXPORT_PROC WinStationReportUIResult, 91
-M_EXPORT_PROC WinStationReset, 92
-M_EXPORT_PROC WinStationRevertFromServicesSession, 93
-M_EXPORT_PROC WinStationSendMessageA, 94
-M_EXPORT_PROC WinStationSendMessageW, 95
-M_EXPORT_PROC WinStationSendWindowMessage, 96
-M_EXPORT_PROC WinStationServerPing, 97
-M_EXPORT_PROC WinStationSetAutologonPassword, 98
-M_EXPORT_PROC WinStationSetInformationA, 99
-M_EXPORT_PROC WinStationSetInformationW, 100
-M_EXPORT_PROC WinStationSetPoolCount, 101
-M_EXPORT_PROC WinStationShadow, 102
-M_EXPORT_PROC WinStationShadowStop, 103
-M_EXPORT_PROC WinStationShutdownSystem, 104
-M_EXPORT_PROC WinStationSwitchToServicesSession, 105
-M_EXPORT_PROC WinStationSystemShutdownStarted, 106
-M_EXPORT_PROC WinStationSystemShutdownWait, 107
-M_EXPORT_PROC WinStationTerminateProcess, 108
-M_EXPORT_PROC WinStationUnRegisterConsoleNotification, 109
-M_EXPORT_PROC WinStationUnRegisterNotificationEvent, 110
-M_EXPORT_PROC WinStationUserLoginAccessCheck, 111
-M_EXPORT_PROC WinStationVerify, 112
-M_EXPORT_PROC WinStationVirtualOpen, 113
-M_EXPORT_PROC WinStationVirtualOpenEx, 114
-M_EXPORT_PROC WinStationWaitSystemEvent, 115
-M_EXPORT_PROC _NWLogonQueryAdmin, 116
-M_EXPORT_PROC _NWLogonSetAdmin, 117
-M_EXPORT_PROC _WinStationAnnoyancePopup, 118
-M_EXPORT_PROC _WinStationBeepOpen, 119
-M_EXPORT_PROC _WinStationBreakPoint, 120
-M_EXPORT_PROC _WinStationCallback, 121
-M_EXPORT_PROC _WinStationCheckForApplicationName, 122
-M_EXPORT_PROC _WinStationFUSCanRemoteUserDisconnect, 123
-M_EXPORT_PROC _WinStationGetApplicationInfo, 124
-M_EXPORT_PROC _WinStationNotifyDisconnectPipe, 125
-M_EXPORT_PROC _WinStationNotifyLogoff, 126
-M_EXPORT_PROC _WinStationNotifyLogon, 127
-M_EXPORT_PROC _WinStationNotifyNewSession, 128
-M_EXPORT_PROC _WinStationOpenSessionDirectory, 129
-M_EXPORT_PROC _WinStationReInitializeSecurity, 130
-M_EXPORT_PROC _WinStationReadRegistry, 131
-M_EXPORT_PROC _WinStationSessionInitialized, 132
-M_EXPORT_PROC _WinStationShadowTarget2, 133
-M_EXPORT_PROC _WinStationShadowTarget, 134
-M_EXPORT_PROC _WinStationShadowTargetSetup, 135
-M_EXPORT_PROC _WinStationUpdateClientCachedCredentials, 136
-M_EXPORT_PROC _WinStationUpdateSettings, 137
-M_EXPORT_PROC _WinStationUpdateUserConfig, 138
-M_EXPORT_PROC _WinStationWaitForConnect, 139
+export LogonIdFromWinStationNameA, 1, 1
+export LogonIdFromWinStationNameW, 2, 2
+export RemoteAssistancePrepareSystemRestore, 3, 3
+export ServerGetInternetConnectorStatus, 4, 4
+export ServerLicensingClose, 5, 5
+export ServerLicensingDeactivateCurrentPolicy, 6, 6
+export ServerLicensingFreePolicyInformation, 7, 7
+export ServerLicensingGetAvailablePolicyIds, 8, 8
+export ServerLicensingGetPolicy, 9, 9
+export ServerLicensingGetPolicyInformationA, 10, 10
+export ServerLicensingGetPolicyInformationW, 11, 11
+export ServerLicensingLoadPolicy, 12, 12
+export ServerLicensingOpenA, 13, 13
+export ServerLicensingOpenW, 14, 14
+export ServerLicensingSetPolicy, 15, 15
+export ServerLicensingUnloadPolicy, 16, 16
+export ServerQueryInetConnectorInformationA, 17, 17
+export ServerQueryInetConnectorInformationW, 18, 18
+export ServerSetInternetConnectorStatus, 19, 19
+export WinStationActivateLicense, 20, 20
+export WinStationAutoReconnect, 21, 21
+export WinStationBroadcastSystemMessage, 22, 22
+export WinStationCheckAccess, 23, 23
+export WinStationCheckLoopBack, 24, 24
+export WinStationCloseServer, 25, 25
+export WinStationConnectA, 26, 26
+export WinStationConnectCallback, 27, 27
+export WinStationConnectEx, 28, 28
+export WinStationConnectW, 29, 29
+export WinStationDisconnect, 30, 30
+export WinStationEnumerateA, 31, 31
+export WinStationEnumerateExW, 32, 32
+export WinStationEnumerateLicenses, 33, 33
+export WinStationEnumerateProcesses, 34, 34
+export WinStationEnumerateW, 35, 35
+export WinStationEnumerate_IndexedA, 36, 36
+export WinStationEnumerate_IndexedW, 37, 37
+export WinStationFreeConsoleNotification, 38, 38
+export WinStationFreeGAPMemory, 39, 39
+export WinStationFreeMemory, 40, 40
+export WinStationFreePropertyValue, 41, 41
+export WinStationFreeUserCertificates, 42, 42
+export WinStationFreeUserCredentials, 43, 43
+export WinStationGenerateLicense, 44, 44
+export WinStationGetAllProcesses, 45, 45
+export WinStationGetAllSessionsW, 46, 46
+export WinStationGetConnectionProperty, 47, 47
+export WinStationGetDeviceId, 48, 48
+export WinStationGetInitialApplication, 49, 49
+export WinStationGetLanAdapterNameA, 50, 50
+export WinStationGetLanAdapterNameW, 51, 51
+export WinStationGetLoggedOnCount, 52, 52
+export WinStationGetMachinePolicy, 53, 53
+export WinStationGetProcessSid, 54, 54
+export WinStationGetRestrictedLogonInfo, 55, 55
+export WinStationGetSessionIds, 56, 56
+export WinStationGetTermSrvCountersValue, 57, 57
+export WinStationGetUserCertificates, 58, 58
+export WinStationGetUserCredentials, 59, 59
+export WinStationGetUserProfile, 60, 60
+export WinStationInstallLicense, 61, 61
+export WinStationIsHelpAssistantSession, 62, 62
+export WinStationIsSessionPermitted, 63, 63
+export WinStationIsSessionRemoteable, 64, 64
+export WinStationNameFromLogonIdA, 65, 65
+export WinStationNameFromLogonIdW, 66, 66
+export WinStationNegotiateSession, 67, 67
+export WinStationNtsdDebug, 68, 68
+export WinStationOpenServerA, 69, 69
+export WinStationOpenServerExA, 70, 70
+export WinStationOpenServerExW, 71, 71
+export WinStationOpenServerW, 72, 72
+export WinStationQueryAllowConcurrentConnections, 73, 73
+export WinStationQueryEnforcementCore, 74, 74
+export WinStationQueryInformationA, 75, 75
+export WinStationQueryInformationW, 76, 76
+export WinStationQueryLicense, 77, 77
+export WinStationQueryLogonCredentialsW, 78, 78
+export WinStationQuerySessionVirtualIP, 79, 79
+export WinStationQueryUpdateRequired, 80, 80
+export WinStationRedirectErrorMessage, 81, 81
+export WinStationRedirectLogonBeginPainting, 82, 82
+export WinStationRedirectLogonError, 83, 83
+export WinStationRedirectLogonMessage, 84, 84
+export WinStationRedirectLogonStatus, 85, 85
+export WinStationRegisterConsoleNotification, 86, 86
+export WinStationRegisterConsoleNotificationEx, 87, 87
+export WinStationRegisterNotificationEvent, 88, 88
+export WinStationRemoveLicense, 89, 89
+export WinStationRenameA, 90, 90
+export WinStationRenameW, 91, 91
+export WinStationReportUIResult, 92, 92
+export WinStationReset, 93, 93
+export WinStationRevertFromServicesSession, 94, 94
+export WinStationSendMessageA, 95, 95
+export WinStationSendMessageW, 96, 96
+export WinStationSendWindowMessage, 97, 97
+export WinStationServerPing, 98, 98
+export WinStationSetAutologonPassword, 99, 99
+export WinStationSetInformationA, 100, 100
+export WinStationSetInformationW, 101, 101
+export WinStationSetPoolCount, 102, 102
+export WinStationShadow, 103, 103
+export WinStationShadowStop, 104, 104
+export WinStationShutdownSystem, 105, 105
+export WinStationSwitchToServicesSession, 106, 106
+export WinStationSystemShutdownStarted, 107, 107
+export WinStationSystemShutdownWait, 108, 108
+export WinStationTerminateProcess, 109, 109
+export WinStationUnRegisterConsoleNotification, 110, 110
+export WinStationUnRegisterNotificationEvent, 111, 111
+export WinStationUserLoginAccessCheck, 112, 112
+export WinStationVerify, 113, 113
+export WinStationVirtualOpen, 114, 114
+export WinStationVirtualOpenEx, 115, 115
+export WinStationWaitSystemEvent, 116, 116
+export _NWLogonQueryAdmin, 117, 117
+export _NWLogonSetAdmin, 118, 118
+export _WinStationAnnoyancePopup, 119, 119
+export _WinStationBeepOpen, 120, 120
+export _WinStationBreakPoint, 121, 121
+export _WinStationCallback, 122, 122
+export _WinStationCheckForApplicationName, 123, 123
+export _WinStationFUSCanRemoteUserDisconnect, 124, 124
+export _WinStationGetApplicationInfo, 125, 125
+export _WinStationNotifyDisconnectPipe, 126, 126
+export _WinStationNotifyLogoff, 127, 127
+export _WinStationNotifyLogon, 128, 128
+export _WinStationNotifyNewSession, 129, 129
+export _WinStationOpenSessionDirectory, 130, 130
+export _WinStationReInitializeSecurity, 131, 131
+export _WinStationReadRegistry, 132, 132
+export _WinStationSessionInitialized, 133, 133
+export _WinStationShadowTarget2, 134, 134
+export _WinStationShadowTarget, 135, 135
+export _WinStationShadowTargetSetup, 136, 136
+export _WinStationUpdateClientCachedCredentials, 137, 137
+export _WinStationUpdateSettings, 138, 138
+export _WinStationUpdateUserConfig, 139, 139
+export _WinStationWaitForConnect, 140, 140
 
-SEH_handler   proc
+SEH_handler PROC
         ; empty handler
         ret
-SEH_handler   endp
+SEH_handler ENDP
 
-end
+END

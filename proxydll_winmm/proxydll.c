@@ -1,51 +1,71 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "proxydll.h"
 
-static HMODULE hmod;
-static LPCSTR export_names[] = {
-        EXPORT_NAMES
-#if defined(_X86_) && defined(EXPORT_NAMES32)
-        , EXPORT_NAMES32
-#endif
-};
-static FARPROC export_procs[_countof(export_names)];
+static HMODULE g_hModule;
 
-bool real_dll_init(void)
+FARPROC __stdcall find_real_function(WORD wOrdinal)
 {
-        TCHAR path[MAX_PATH];
+        TCHAR Path[MAX_PATH];
+        HMODULE hModule;
+        PIMAGE_DOS_HEADER pDosHeader;
+        PIMAGE_NT_HEADERS pNtHeader;
+        PIMAGE_EXPORT_DIRECTORY pExportDirectory;
+        DWORD Count;
+        HMODULE temp;
+        LPCSTR ModuleName;
+        DWORD *Names;
+        WORD *NameOrdinals;
+        LPCSTR ProcName;
 
-        if ( !hmod ) {
-                GetSystemDirectory(path, _countof(path));
-                _tcscat_s(path, _countof(path), _T(DLL_FNAME));
-                hmod = LoadLibrary(path);
+        if ( !wOrdinal )
+                return NULL;
+
+        pDosHeader = (PIMAGE_DOS_HEADER)&__ImageBase;
+        if ( pDosHeader->e_magic != IMAGE_DOS_SIGNATURE )
+                return NULL;
+
+        pNtHeader = OffsetToPointer(pDosHeader, pDosHeader->e_lfanew);
+        pExportDirectory = OffsetToPointer(pDosHeader,
+                pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+
+        if ( wOrdinal - pExportDirectory->Base >= pExportDirectory->NumberOfFunctions )
+                return NULL;
+
+        if ( !(hModule = InterlockedCompareExchangePointer(&(PVOID)g_hModule, NULL, NULL)) ) {
+                ModuleName = OffsetToPointer(pDosHeader, pExportDirectory->Name);
+                Count = GetSystemDirectory(Path, _countof(Path));
+                if ( _stprintf_s(Path + Count, _countof(Path) - Count, _T("\\%hs"), ModuleName) == -1
+                        || !(hModule = LoadLibraryEx(Path, NULL, 0)) ) {
+
+                        return NULL;
+                }
+
+                if ( temp = InterlockedCompareExchangePointer(&(PVOID)g_hModule, hModule, NULL) ) {
+                        FreeLibrary(hModule);
+                        hModule = temp;
+                }
         }
-        return !!hmod;
+
+        NameOrdinals = OffsetToPointer(pDosHeader,
+                pExportDirectory->AddressOfNameOrdinals);
+        Names = OffsetToPointer(pDosHeader,
+                pExportDirectory->AddressOfNames);
+        ProcName = MAKEINTRESOURCEA(wOrdinal);
+
+        for ( DWORD i = 0; i < pExportDirectory->NumberOfNames; ++i ) {
+                if ( wOrdinal != pExportDirectory->Base + NameOrdinals[i] )
+                        continue;
+
+                return GetProcAddress(hModule,
+                        OffsetToPointer(pDosHeader, Names[i]));
+        }
+        return GetProcAddress(hModule, MAKEINTRESOURCEA(wOrdinal));
 }
 
-bool real_dll_free(void)
+void __stdcall free_real_dll(void)
 {
-        bool result = false;
+        HMODULE hModule;
 
-        if ( !hmod )
-                return result;
-
-        if ( FreeLibrary(hmod) ) {
-                hmod = NULL;
-                result = true;
-        }
-
-        return result;
-}
-
-FARPROC resolve_export_proc(size_t index)
-{
-        if ( index < _countof(export_names)
-                && index < _countof(export_procs) ) {
-                if ( hmod && export_procs[index] )
-                        return export_procs[index];
-
-                if ( real_dll_init() )
-                        return export_procs[index] = GetProcAddress(hmod, export_names[index]);
-        }
-        return NULL;
+        if ( hModule = InterlockedExchangePointer(&(PVOID)g_hModule, NULL) )
+                FreeLibrary(hModule);
 }

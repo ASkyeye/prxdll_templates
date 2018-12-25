@@ -1,7 +1,9 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "proxydll.h"
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule,
+        DWORD ul_reason_for_call,
+        LPVOID lpReserved)
 {
         switch ( ul_reason_for_call ) {
         case DLL_PROCESS_ATTACH:
@@ -9,9 +11,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 break;
         case DLL_PROCESS_DETACH:
                 if ( !lpReserved )
-                        real_dll_free();
-                break;
-        default:
+                        free_real_dll();
                 break;
         }
         return TRUE;

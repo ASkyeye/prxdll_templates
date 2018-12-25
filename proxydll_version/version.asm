@@ -1,62 +1,68 @@
-ifndef x64
-        .model flat, stdcall
-        .safeseh SEH_handler
-endif
+IFNDEF x64
+        .MODEL FLAT, STDCALL
+        .SAFESEH SEH_handler
+ENDIF
 
-.code
+.CODE
 
-ifndef x64
-        resolve_export_proc proto C, arg1:dword
-else
-        extern resolve_export_proc:proc
-endif
+IFNDEF x64
+        find_real_function PROTO STDCALL, arg1:WORD
+ELSE
+        EXTERN find_real_function:PROC
+ENDIF
 
-M_EXPORT_PROC macro export, index
-export proc
-ifndef x64
-        invoke resolve_export_proc, index
-        jmp dword ptr eax
-else
-        push rcx
-        push rdx
-        push r8
-        push r9
-        sub rsp, 28h
-if index eq 0
-        xor rcx, rcx
-else
-        mov rcx, index
-endif
-        call resolve_export_proc
-        add rsp, 28h
-        pop r9
-        pop r8
-        pop rdx
-        pop rcx
-        jmp qword ptr rax
-endif
-export endp
-endm
+export MACRO name, x, y
+IFNDEF x64 AND x NE 0
+    name PROC
+            INVOKE find_real_function, x
+            test eax, eax
+            jz bye
+            jmp dword ptr eax
+    bye:
+            ret
+    name ENDP
+ELSEIFDEF x64 AND y NE 0
+    name PROC
+            push rcx
+            push rdx
+            push r8
+            push r9
+            sub rsp, 28h
+            mov rcx, y
+            call find_real_function
+            add rsp, 28h
+            pop r9
+            pop r8
+            pop rdx
+            pop rcx
+            test rax, rax
+            jz bye
+            jmp qword ptr rax
+    bye:    
+            ret
+    name ENDP
+ENDIF
+ENDM
 
-M_EXPORT_PROC GetFileVersionInfoA, 0
-M_EXPORT_PROC GetFileVersionInfoByHandle, 1
-M_EXPORT_PROC GetFileVersionInfoExW, 2
-M_EXPORT_PROC GetFileVersionInfoSizeA, 3
-M_EXPORT_PROC GetFileVersionInfoSizeExW, 4
-M_EXPORT_PROC GetFileVersionInfoSizeW, 5
-M_EXPORT_PROC GetFileVersionInfoW, 6
-M_EXPORT_PROC VerFindFileA, 7
-M_EXPORT_PROC VerFindFileW, 8
-M_EXPORT_PROC VerInstallFileA, 9
-M_EXPORT_PROC VerInstallFileW, 10
-M_EXPORT_PROC VerLanguageNameA, 11
-M_EXPORT_PROC VerLanguageNameW, 12
-M_EXPORT_PROC VerQueryValueA, 13
-M_EXPORT_PROC VerQueryValueW, 14
+export GetFileVersionInfoA, 1, 1
+export GetFileVersionInfoByHandle, 2, 2
+export GetFileVersionInfoExW, 3, 3
+export GetFileVersionInfoSizeA, 4, 4
+export GetFileVersionInfoSizeExW, 5, 5
+export GetFileVersionInfoSizeW, 6, 6
+export GetFileVersionInfoW, 7, 7
+export VerFindFileA, 8, 8
+export VerFindFileW, 9, 9
+export VerInstallFileA, 10, 10
+export VerInstallFileW, 11, 11
+export VerLanguageNameA, 12, 12
+export VerLanguageNameW, 13, 13
+export VerQueryValueA, 14, 14
+export VerQueryValueW, 15, 15
 
-SEH_handler   proc
+SEH_handler PROC
         ; empty handler
         ret
-SEH_handler   endp
+SEH_handler ENDP
 
-end
+END
