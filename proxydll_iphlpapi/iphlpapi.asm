@@ -6,15 +6,15 @@ ENDIF
 .CODE
 
 IFNDEF x64
-        find_real_function PROTO STDCALL, arg1:WORD
+        proxydll_find_function PROTO STDCALL, arg1:WORD
 ELSE
-        EXTERN find_real_function:PROC
+        EXTERN proxydll_find_function:PROC
 ENDIF
 
 export MACRO name, x, y
 IFNDEF x64 AND x NE 0
     name PROC
-            INVOKE find_real_function, x
+            INVOKE proxydll_find_function, x
             test eax, eax
             jz bye
             jmp dword ptr eax
@@ -29,7 +29,7 @@ ELSEIFDEF x64 AND y NE 0
             push r9
             sub rsp, 28h
             mov rcx, y
-            call find_real_function
+            call proxydll_find_function
             add rsp, 28h
             pop r9
             pop r8

@@ -12,6 +12,5 @@
 // reference additional headers your program requires here
 
 
-extern IMAGE_DOS_HEADER __ImageBase;
 #define OffsetToPointer(Base, Offset) ((PVOID)(((PBYTE)(Base)) + ((UINT_PTR)(Offset))))
 #define PointerToOffset(Base, Pointer) ((INT_PTR)(((PBYTE)(Pointer)) - ((PBYTE)(Base))))

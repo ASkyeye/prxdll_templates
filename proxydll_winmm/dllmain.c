@@ -7,11 +7,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 {
         switch ( ul_reason_for_call ) {
         case DLL_PROCESS_ATTACH:
-                DisableThreadLibraryCalls(hModule);
-                break;
+                return proxydll_attach(hModule);
         case DLL_PROCESS_DETACH:
                 if ( !lpReserved )
-                        free_real_dll();
+                        proxydll_detach();
                 break;
         }
         return TRUE;

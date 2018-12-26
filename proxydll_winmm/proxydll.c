@@ -1,41 +1,35 @@
 #include "pch.h"
 #include "proxydll.h"
 
+static PIMAGE_DOS_HEADER g_pImageBase;
+static PIMAGE_EXPORT_DIRECTORY g_pExportDirectory;
 static HMODULE g_hModule;
+static PVOID *g_pPointers;
 
-FARPROC __stdcall find_real_function(WORD wOrdinal)
+PVOID __stdcall proxydll_find_function(WORD wOrdinal)
 {
         TCHAR Path[MAX_PATH];
         HMODULE hModule;
-        PIMAGE_DOS_HEADER pDosHeader;
-        PIMAGE_NT_HEADERS pNtHeader;
-        PIMAGE_EXPORT_DIRECTORY pExportDirectory;
+        DWORD Index;
         DWORD Count;
-        HMODULE temp;
+        PVOID temp;
         LPCSTR ModuleName;
+        PVOID Result;
         DWORD *Names;
         WORD *NameOrdinals;
+        LPCSTR ProcName;
 
         if ( !wOrdinal )
                 return NULL;
 
-        pDosHeader = &__ImageBase;
-        if ( pDosHeader->e_magic != IMAGE_DOS_SIGNATURE )
-                return NULL;
-
-        pNtHeader = OffsetToPointer(pDosHeader, pDosHeader->e_lfanew);
-        if ( pNtHeader->Signature != IMAGE_NT_SIGNATURE )
-                return NULL;
-
-        pExportDirectory = OffsetToPointer(pDosHeader,
-                pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
-
-        if ( wOrdinal - pExportDirectory->Base >= pExportDirectory->NumberOfFunctions )
+        Index = wOrdinal - g_pExportDirectory->Base;
+        if ( Index >= g_pExportDirectory->NumberOfFunctions )
                 return NULL;
 
         if ( !(hModule = InterlockedCompareExchangePointer(&(PVOID)g_hModule, NULL, NULL)) ) {
-                ModuleName = OffsetToPointer(pDosHeader, pExportDirectory->Name);
+                ModuleName = OffsetToPointer(g_pImageBase, g_pExportDirectory->Name);
                 Count = GetSystemDirectory(Path, _countof(Path));
+
                 if ( _stprintf_s(Path + Count, _countof(Path) - Count, _T("\\%hs"), ModuleName) == -1
                         || !(hModule = LoadLibraryEx(Path, NULL, 0)) ) {
 
@@ -48,25 +42,52 @@ FARPROC __stdcall find_real_function(WORD wOrdinal)
                 }
         }
 
-        NameOrdinals = OffsetToPointer(pDosHeader,
-                pExportDirectory->AddressOfNameOrdinals);
-        Names = OffsetToPointer(pDosHeader,
-                pExportDirectory->AddressOfNames);
+        if ( !(Result = InterlockedCompareExchangePointer(&g_pPointers[Index], NULL, NULL)) ) {
+                NameOrdinals = OffsetToPointer(g_pImageBase,
+                        g_pExportDirectory->AddressOfNameOrdinals);
+                Names = OffsetToPointer(g_pImageBase,
+                        g_pExportDirectory->AddressOfNames);
+                ProcName = MAKEINTRESOURCEA(wOrdinal);
 
-        for ( DWORD i = 0; i < pExportDirectory->NumberOfNames; ++i ) {
-                if ( wOrdinal != pExportDirectory->Base + NameOrdinals[i] )
-                        continue;
+                for ( DWORD i = 0; i < g_pExportDirectory->NumberOfNames; ++i ) {
+                        if ( wOrdinal != g_pExportDirectory->Base + NameOrdinals[i] )
+                                continue;
 
-                return GetProcAddress(hModule,
-                        OffsetToPointer(pDosHeader, Names[i]));
+                        ProcName = OffsetToPointer(g_pImageBase, Names[i]);
+                }
+                if ( (Result = GetProcAddress(hModule, ProcName))
+                        && (temp = InterlockedCompareExchangePointer(&g_pPointers[Index], Result, NULL)) )
+                        Result = temp;
         }
-        return GetProcAddress(hModule, MAKEINTRESOURCEA(wOrdinal));
+        return Result;
 }
 
-void __stdcall free_real_dll(void)
+// call this exactly once in the DllMain DLL_PROCESS_ATTACH handler
+bool __stdcall proxydll_attach(HMODULE hModule)
 {
-        HMODULE hModule;
+        PIMAGE_NT_HEADERS pNtHeader;
 
-        if ( hModule = InterlockedExchangePointer(&(PVOID)g_hModule, NULL) )
-                FreeLibrary(hModule);
+        g_pImageBase = (PIMAGE_DOS_HEADER)hModule;
+        if ( g_pImageBase->e_magic != IMAGE_DOS_SIGNATURE )
+                return false;
+
+        pNtHeader = OffsetToPointer(g_pImageBase, g_pImageBase->e_lfanew);
+        if ( pNtHeader->Signature != IMAGE_NT_SIGNATURE
+                || pNtHeader->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC )
+                return false;
+
+        g_pExportDirectory = OffsetToPointer(g_pImageBase,
+                pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+
+        if ( !(g_pPointers = calloc(g_pExportDirectory->NumberOfFunctions, sizeof *g_pPointers)) )
+                return false;
+
+        return true;
+}
+
+// call this exactly once in the DllMain DLL_PROCESS_DETACH handler
+void __stdcall proxydll_detach(void)
+{
+        FreeLibrary(g_hModule);
+        free(g_pPointers);
 }
