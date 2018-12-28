@@ -54,21 +54,20 @@ EXPORT MACRO langtype:REQ, procname:REQ, ordinal1:REQ, ordinal2
     ENDIF
 ENDM
 
-EXPORT STDCALL, GetFileVersionInfoA, 1
-EXPORT STDCALL, GetFileVersionInfoByHandle, 2
-EXPORT STDCALL, GetFileVersionInfoExW, 3
-EXPORT STDCALL, GetFileVersionInfoSizeA, 4
-EXPORT STDCALL, GetFileVersionInfoSizeExW, 5
-EXPORT STDCALL, GetFileVersionInfoSizeW, 6
-EXPORT STDCALL, GetFileVersionInfoW, 7
-EXPORT STDCALL, VerFindFileA, 8
-EXPORT STDCALL, VerFindFileW, 9
-EXPORT STDCALL, VerInstallFileA, 10
-EXPORT STDCALL, VerInstallFileW, 11
-EXPORT STDCALL, VerLanguageNameA, 12
-EXPORT STDCALL, VerLanguageNameW, 13
-EXPORT STDCALL, VerQueryValueA, 14
-EXPORT STDCALL, VerQueryValueW, 15
+EXPORT STDCALL, Direct3DShaderValidatorCreate9, 1
+EXPORT STDCALL, PSGPError, 2
+EXPORT STDCALL, PSGPSampleTexture, 3
+EXPORT STDCALL, D3DPERF_BeginEvent, 4
+EXPORT STDCALL, D3DPERF_EndEvent, 5
+EXPORT STDCALL, D3DPERF_GetStatus, 6
+EXPORT STDCALL, D3DPERF_QueryRepeatFrame, 7
+EXPORT STDCALL, D3DPERF_SetMarker, 8
+EXPORT STDCALL, D3DPERF_SetOptions, 9
+EXPORT STDCALL, D3DPERF_SetRegion, 10
+EXPORT STDCALL, DebugSetLevel, 11
+EXPORT STDCALL, DebugSetMute, 12
+EXPORT STDCALL, Direct3DCreate9, 13
+EXPORT STDCALL, Direct3DCreate9Ex, 14
 
 SEH_handler PROC
         ; empty handler

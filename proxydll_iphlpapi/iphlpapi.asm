@@ -1,5 +1,5 @@
 IFNDEF x64
-        .MODEL FLAT, STDCALL
+        .MODEL FLAT
         .SAFESEH SEH_handler
 ENDIF
 
@@ -11,301 +11,311 @@ ELSE
         EXTERN proxydll_find_function:PROC
 ENDIF
 
-export MACRO name, x, y
-IFNDEF x64 AND x NE 0
-    name PROC
-            INVOKE proxydll_find_function, x
-            test eax, eax
-            jz bye
+EXPORT32 MACRO langtype:REQ, procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFNDEF x64
+        procname PROC langtype
+            INVOKE proxydll_find_function, ordinal
             jmp dword ptr eax
-    bye:
-            ret
-    name ENDP
-ELSEIFDEF x64 AND y NE 0
-    name PROC
-            push rcx
-            push rdx
-            push r8
-            push r9
-            sub rsp, 28h
-            mov rcx, y
-            call proxydll_find_function
-            add rsp, 28h
-            pop r9
-            pop r8
-            pop rdx
-            pop rcx
-            test rax, rax
-            jz bye
-            jmp qword ptr rax
-    bye:    
-            ret
-    name ENDP
-ENDIF
+        procname ENDP
+    ENDIF
 ENDM
 
-export AddIPAddress, 1, 1
-export AllocateAndGetInterfaceInfoFromStack, 2, 2
-export AllocateAndGetIpAddrTableFromStack, 3, 3
-export CPNatfwtCreateProviderInstance, 4, 4
-export CPNatfwtDeregisterProviderInstance, 5, 5
-export CPNatfwtDestroyProviderInstance, 6, 6
-export CPNatfwtIndicateReceivedBuffers, 7, 7
-export CPNatfwtRegisterProviderInstance, 8, 8
-export CancelIPChangeNotify, 9, 9
-export CancelMibChangeNotify2, 10, 10
-export ConvertGuidToStringA, 11, 11
-export ConvertGuidToStringW, 12, 12
-export ConvertInterfaceAliasToLuid, 13, 13
-export ConvertInterfaceGuidToLuid, 14, 14
-export ConvertInterfaceIndexToLuid, 15, 15
-export ConvertInterfaceLuidToAlias, 16, 16
-export ConvertInterfaceLuidToGuid, 17, 17
-export ConvertInterfaceLuidToIndex, 18, 18
-export ConvertInterfaceLuidToNameA, 19, 19
-export ConvertInterfaceLuidToNameW, 20, 20
-export ConvertInterfaceNameToLuidA, 21, 21
-export ConvertInterfaceNameToLuidW, 22, 22
-export ConvertInterfacePhysicalAddressToLuid, 23, 23
-export ConvertIpv4MaskToLength, 24, 24
-export ConvertLengthToIpv4Mask, 25, 25
-export ConvertRemoteInterfaceAliasToLuid, 26, 26
-export ConvertRemoteInterfaceGuidToLuid, 27, 27
-export ConvertRemoteInterfaceIndexToLuid, 28, 28
-export ConvertRemoteInterfaceLuidToAlias, 29, 29
-export ConvertRemoteInterfaceLuidToGuid, 30, 30
-export ConvertRemoteInterfaceLuidToIndex, 31, 31
-export ConvertStringToGuidA, 32, 32
-export ConvertStringToGuidW, 33, 33
-export ConvertStringToInterfacePhysicalAddress, 34, 34
-export CreateAnycastIpAddressEntry, 35, 35
-export CreateIpForwardEntry2, 36, 36
-export CreateIpForwardEntry, 37, 37
-export CreateIpNetEntry2, 38, 38
-export CreateIpNetEntry, 39, 39
-export CreatePersistentTcpPortReservation, 40, 40
-export CreatePersistentUdpPortReservation, 41, 41
-export CreateProxyArpEntry, 42, 42
-export CreateSortedAddressPairs, 43, 43
-export CreateUnicastIpAddressEntry, 44, 44
-export DeleteAnycastIpAddressEntry, 45, 45
-export DeleteIPAddress, 46, 46
-export DeleteIpForwardEntry2, 47, 47
-export DeleteIpForwardEntry, 48, 48
-export DeleteIpNetEntry2, 49, 49
-export DeleteIpNetEntry, 50, 50
-export DeletePersistentTcpPortReservation, 51, 51
-export DeletePersistentUdpPortReservation, 52, 52
-export DeleteProxyArpEntry, 53, 53
-export DeleteUnicastIpAddressEntry, 54, 54
-export DisableMediaSense, 55, 55
-export EnableRouter, 56, 56
-export FlushIpNetTable2, 57, 57
-export FlushIpNetTable, 58, 58
-export FlushIpPathTable, 59, 59
-export FreeMibTable, 60, 60
-export GetAdapterIndex, 61, 61
-export GetAdapterOrderMap, 62, 62
-export GetAdaptersAddresses, 63, 63
-export GetAdaptersInfo, 64, 64
-export GetAnycastIpAddressEntry, 65, 65
-export GetAnycastIpAddressTable, 66, 66
-export GetBestInterface, 67, 67
-export GetBestInterfaceEx, 68, 68
-export GetBestRoute2, 69, 69
-export GetBestRoute, 70, 70
-export GetCurrentThreadCompartmentId, 71, 71
-export GetExtendedTcpTable, 72, 72
-export GetExtendedUdpTable, 73, 73
-export GetFriendlyIfIndex, 74, 74
-export GetIcmpStatistics, 75, 75
-export GetIcmpStatisticsEx, 76, 76
-export GetIfEntry2, 77, 77
-export GetIfEntry, 78, 78
-export GetIfStackTable, 79, 79
-export GetIfTable2, 80, 80
-export GetIfTable2Ex, 81, 81
-export GetIfTable, 82, 82
-export GetInterfaceInfo, 83, 83
-export GetInvertedIfStackTable, 84, 84
-export GetIpAddrTable, 85, 85
-export GetIpErrorString, 86, 86
-export GetIpForwardEntry2, 87, 87
-export GetIpForwardTable2, 88, 88
-export GetIpForwardTable, 89, 89
-export GetIpInterfaceEntry, 90, 90
-export GetIpInterfaceTable, 91, 91
-export GetIpNetEntry2, 92, 92
-export GetIpNetTable2, 93, 93
-export GetIpNetTable, 94, 94
-export GetIpPathEntry, 95, 95
-export GetIpPathTable, 96, 96
-export GetIpStatistics, 97, 97
-export GetIpStatisticsEx, 98, 98
-export GetMulticastIpAddressEntry, 99, 99
-export GetMulticastIpAddressTable, 100, 100
-export GetNetworkInformation, 101, 101
-export GetNetworkParams, 102, 102
-export GetNumberOfInterfaces, 103, 103
-export GetOwnerModuleFromPidAndInfo, 104, 104
-export GetOwnerModuleFromTcp6Entry, 105, 105
-export GetOwnerModuleFromTcpEntry, 106, 106
-export GetOwnerModuleFromUdp6Entry, 107, 107
-export GetOwnerModuleFromUdpEntry, 108, 108
-export GetPerAdapterInfo, 109, 109
-export GetPerTcp6ConnectionEStats, 110, 110
-export GetPerTcp6ConnectionStats, 111, 111
-export GetPerTcpConnectionEStats, 112, 112
-export GetPerTcpConnectionStats, 113, 113
-export GetRTTAndHopCount, 114, 114
-export GetSessionCompartmentId, 115, 115
-export GetTcp6Table2, 116, 116
-export GetTcp6Table, 117, 117
-export GetTcpStatistics, 118, 118
-export GetTcpStatisticsEx, 119, 119
-export GetTcpTable2, 120, 120
-export GetTcpTable, 121, 121
-export GetTeredoPort, 122, 122
-export GetUdp6Table, 123, 123
-export GetUdpStatistics, 124, 124
-export GetUdpStatisticsEx, 125, 125
-export GetUdpTable, 126, 126
-export GetUniDirectionalAdapterInfo, 127, 127
-export GetUnicastIpAddressEntry, 128, 128
-export GetUnicastIpAddressTable, 129, 129
-export Icmp6CreateFile, 130, 130
-export Icmp6ParseReplies, 131, 131
-export Icmp6SendEcho2, 132, 132
-export IcmpCloseHandle, 133, 133
-export IcmpCreateFile, 134, 134
-export IcmpParseReplies, 135, 135
-export IcmpSendEcho2, 136, 136
-export IcmpSendEcho2Ex, 137, 137
-export IcmpSendEcho, 138, 138
-export InitializeIpForwardEntry, 139, 139
-export InitializeIpInterfaceEntry, 140, 140
-export InitializeUnicastIpAddressEntry, 141, 141
-export InternalCleanupPersistentStore, 142, 142
-export InternalCreateAnycastIpAddressEntry, 143, 143
-export InternalCreateIpForwardEntry2, 144, 144
-export InternalCreateIpForwardEntry, 145, 145
-export InternalCreateIpNetEntry2, 146, 146
-export InternalCreateIpNetEntry, 147, 147
-export InternalCreateUnicastIpAddressEntry, 148, 148
-export InternalDeleteAnycastIpAddressEntry, 149, 149
-export InternalDeleteIpForwardEntry2, 150, 150
-export InternalDeleteIpForwardEntry, 151, 151
-export InternalDeleteIpNetEntry2, 152, 152
-export InternalDeleteIpNetEntry, 153, 153
-export InternalDeleteUnicastIpAddressEntry, 154, 154
-export InternalFindInterfaceByAddress, 155, 155
-export InternalGetAnycastIpAddressEntry, 156, 156
-export InternalGetAnycastIpAddressTable, 157, 157
-export InternalGetForwardIpTable2, 158, 158
-export InternalGetIfEntry2, 159, 159
-export InternalGetIfTable2, 160, 160
-export InternalGetIfTable, 161, 161
-export InternalGetIpAddrTable, 162, 162
-export InternalGetIpForwardEntry2, 163, 163
-export InternalGetIpForwardTable, 164, 164
-export InternalGetIpInterfaceEntry, 165, 165
-export InternalGetIpInterfaceTable, 166, 166
-export InternalGetIpNetEntry2, 167, 167
-export InternalGetIpNetTable2, 168, 168
-export InternalGetIpNetTable, 169, 169
-export InternalGetMulticastIpAddressEntry, 170, 170
-export InternalGetMulticastIpAddressTable, 171, 171
-export InternalGetTcp6Table2, 172, 172
-export InternalGetTcp6TableWithOwnerModule, 173, 173
-export InternalGetTcp6TableWithOwnerPid, 174, 174
-export InternalGetTcpTable2, 175, 175
-export InternalGetTcpTable, 176, 176
-export InternalGetTcpTableEx, 177, 177
-export InternalGetTcpTableWithOwnerModule, 178, 178
-export InternalGetTcpTableWithOwnerPid, 179, 179
-export InternalGetTunnelPhysicalAdapter, 180, 180
-export InternalGetUdp6TableWithOwnerModule, 181, 181
-export InternalGetUdp6TableWithOwnerPid, 182, 182
-export InternalGetUdpTable, 183, 183
-export InternalGetUdpTableEx, 184, 184
-export InternalGetUdpTableWithOwnerModule, 185, 185
-export InternalGetUdpTableWithOwnerPid, 186, 186
-export InternalGetUnicastIpAddressEntry, 187, 187
-export InternalGetUnicastIpAddressTable, 188, 188
-export InternalSetIfEntry, 189, 189
-export InternalSetIpForwardEntry2, 190, 190
-export InternalSetIpForwardEntry, 191, 191
-export InternalSetIpInterfaceEntry, 192, 192
-export InternalSetIpNetEntry2, 193, 193
-export InternalSetIpNetEntry, 194, 194
-export InternalSetIpStats, 195, 195
-export InternalSetTcpEntry, 196, 196
-export InternalSetTeredoPort, 197, 197
-export InternalSetUnicastIpAddressEntry, 198, 198
-export IpReleaseAddress, 199, 199
-export IpRenewAddress, 200, 200
-export LookupPersistentTcpPortReservation, 201, 201
-export LookupPersistentUdpPortReservation, 202, 202
-export NTPTimeToNTFileTime, 203, 203
-export NTTimeToNTPTime, 204, 204
-export NhGetGuidFromInterfaceName, 205, 205
-export NhGetInterfaceDescriptionFromGuid, 206, 206
-export NhGetInterfaceNameFromDeviceGuid, 207, 207
-export NhGetInterfaceNameFromGuid, 208, 208
-export NhpAllocateAndGetInterfaceInfoFromStack, 209, 209
-export NotifyAddrChange, 210, 210
-export NotifyIpInterfaceChange, 211, 211
-export NotifyRouteChange2, 212, 212
-export NotifyRouteChange, 213, 213
-export NotifyStableUnicastIpAddressTable, 214, 214
-export NotifyTeredoPortChange, 215, 215
-export NotifyUnicastIpAddressChange, 216, 216
-export ParseNetworkString, 217, 217
-export PfAddFiltersToInterface, 218, 218
-export PfAddGlobalFilterToInterface, 219, 219
-export PfBindInterfaceToIPAddress, 220, 220
-export PfBindInterfaceToIndex, 221, 221
-export PfCreateInterface, 222, 222
-export PfDeleteInterface, 223, 223
-export PfDeleteLog, 224, 224
-export PfGetInterfaceStatistics, 225, 225
-export PfMakeLog, 226, 226
-export PfRebindFilters, 227, 227
-export PfRemoveFilterHandles, 228, 228
-export PfRemoveFiltersFromInterface, 229, 229
-export PfRemoveGlobalFilterFromInterface, 230, 230
-export PfSetLogBuffer, 231, 231
-export PfTestPacket, 232, 232
-export PfUnBindInterface, 233, 233
-export ResolveIpNetEntry2, 234, 234
-export ResolveNeighbor, 235, 235
-export RestoreMediaSense, 236, 236
-export SendARP, 237, 237
-export SetAdapterIpAddress, 238, 238
-export SetCurrentThreadCompartmentId, 239, 239
-export SetIfEntry, 240, 240
-export SetIpForwardEntry2, 241, 241
-export SetIpForwardEntry, 242, 242
-export SetIpInterfaceEntry, 243, 243
-export SetIpNetEntry2, 244, 244
-export SetIpNetEntry, 245, 245
-export SetIpStatistics, 246, 246
-export SetIpStatisticsEx, 247, 247
-export SetIpTTL, 248, 248
-export SetNetworkInformation, 249, 249
-export SetPerTcp6ConnectionEStats, 250, 250
-export SetPerTcp6ConnectionStats, 251, 251
-export SetPerTcpConnectionEStats, 252, 252
-export SetPerTcpConnectionStats, 253, 253
-export SetSessionCompartmentId, 254, 254
-export SetTcpEntry, 255, 255
-export SetUnicastIpAddressEntry, 256, 256
-export UnenableRouter, 257, 257
-export do_echo_rep, 258, 258
-export do_echo_req, 259, 259
-export if_indextoname, 260, 260
-export if_nametoindex, 261, 261
-export register_icmp, 262, 262
+EXPORT64 MACRO procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFDEF x64
+        procname PROC
+                push rcx
+                push rdx
+                push r8
+                push r9
+                sub rsp, 28h
+                mov rcx, ordinal
+                call proxydll_find_function
+                add rsp, 28h
+                pop r9
+                pop r8
+                pop rdx
+                pop rcx
+                jmp qword ptr rax
+        procname ENDP
+    ENDIF
+ENDM
+
+EXPORT MACRO langtype:REQ, procname:REQ, ordinal1:REQ, ordinal2
+    EXPORT32 langtype, procname, ordinal1
+    
+    IFB <ordinal2>
+        EXPORT64 procname, ordinal1
+    ELSE
+        EXPORT64 procname, ordinal2
+    ENDIF
+ENDM
+
+EXPORT STDCALL, AddIPAddress, 1
+EXPORT STDCALL, AllocateAndGetInterfaceInfoFromStack, 2
+EXPORT STDCALL, AllocateAndGetIpAddrTableFromStack, 3
+EXPORT STDCALL, CPNatfwtCreateProviderInstance, 4
+EXPORT STDCALL, CPNatfwtDeregisterProviderInstance, 5
+EXPORT STDCALL, CPNatfwtDestroyProviderInstance, 6
+EXPORT STDCALL, CPNatfwtIndicateReceivedBuffers, 7
+EXPORT STDCALL, CPNatfwtRegisterProviderInstance, 8
+EXPORT STDCALL, CancelIPChangeNotify, 9
+EXPORT STDCALL, CancelMibChangeNotify2, 10
+EXPORT STDCALL, ConvertGuidToStringA, 11
+EXPORT STDCALL, ConvertGuidToStringW, 12
+EXPORT STDCALL, ConvertInterfaceAliasToLuid, 13
+EXPORT STDCALL, ConvertInterfaceGuidToLuid, 14
+EXPORT STDCALL, ConvertInterfaceIndexToLuid, 15
+EXPORT STDCALL, ConvertInterfaceLuidToAlias, 16
+EXPORT STDCALL, ConvertInterfaceLuidToGuid, 17
+EXPORT STDCALL, ConvertInterfaceLuidToIndex, 18
+EXPORT STDCALL, ConvertInterfaceLuidToNameA, 19
+EXPORT STDCALL, ConvertInterfaceLuidToNameW, 20
+EXPORT STDCALL, ConvertInterfaceNameToLuidA, 21
+EXPORT STDCALL, ConvertInterfaceNameToLuidW, 22
+EXPORT STDCALL, ConvertInterfacePhysicalAddressToLuid, 23
+EXPORT STDCALL, ConvertIpv4MaskToLength, 24
+EXPORT STDCALL, ConvertLengthToIpv4Mask, 25
+EXPORT STDCALL, ConvertRemoteInterfaceAliasToLuid, 26
+EXPORT STDCALL, ConvertRemoteInterfaceGuidToLuid, 27
+EXPORT STDCALL, ConvertRemoteInterfaceIndexToLuid, 28
+EXPORT STDCALL, ConvertRemoteInterfaceLuidToAlias, 29
+EXPORT STDCALL, ConvertRemoteInterfaceLuidToGuid, 30
+EXPORT STDCALL, ConvertRemoteInterfaceLuidToIndex, 31
+EXPORT STDCALL, ConvertStringToGuidA, 32
+EXPORT STDCALL, ConvertStringToGuidW, 33
+EXPORT STDCALL, ConvertStringToInterfacePhysicalAddress, 34
+EXPORT STDCALL, CreateAnycastIpAddressEntry, 35
+EXPORT STDCALL, CreateIpForwardEntry2, 36
+EXPORT STDCALL, CreateIpForwardEntry, 37
+EXPORT STDCALL, CreateIpNetEntry2, 38
+EXPORT STDCALL, CreateIpNetEntry, 39
+EXPORT STDCALL, CreatePersistentTcpPortReservation, 40
+EXPORT STDCALL, CreatePersistentUdpPortReservation, 41
+EXPORT STDCALL, CreateProxyArpEntry, 42
+EXPORT STDCALL, CreateSortedAddressPairs, 43
+EXPORT STDCALL, CreateUnicastIpAddressEntry, 44
+EXPORT STDCALL, DeleteAnycastIpAddressEntry, 45
+EXPORT STDCALL, DeleteIPAddress, 46
+EXPORT STDCALL, DeleteIpForwardEntry2, 47
+EXPORT STDCALL, DeleteIpForwardEntry, 48
+EXPORT STDCALL, DeleteIpNetEntry2, 49
+EXPORT STDCALL, DeleteIpNetEntry, 50
+EXPORT STDCALL, DeletePersistentTcpPortReservation, 51
+EXPORT STDCALL, DeletePersistentUdpPortReservation, 52
+EXPORT STDCALL, DeleteProxyArpEntry, 53
+EXPORT STDCALL, DeleteUnicastIpAddressEntry, 54
+EXPORT STDCALL, DisableMediaSense, 55
+EXPORT STDCALL, EnableRouter, 56
+EXPORT STDCALL, FlushIpNetTable2, 57
+EXPORT STDCALL, FlushIpNetTable, 58
+EXPORT STDCALL, FlushIpPathTable, 59
+EXPORT STDCALL, FreeMibTable, 60
+EXPORT STDCALL, GetAdapterIndex, 61
+EXPORT STDCALL, GetAdapterOrderMap, 62
+EXPORT STDCALL, GetAdaptersAddresses, 63
+EXPORT STDCALL, GetAdaptersInfo, 64
+EXPORT STDCALL, GetAnycastIpAddressEntry, 65
+EXPORT STDCALL, GetAnycastIpAddressTable, 66
+EXPORT STDCALL, GetBestInterface, 67
+EXPORT STDCALL, GetBestInterfaceEx, 68
+EXPORT STDCALL, GetBestRoute2, 69
+EXPORT STDCALL, GetBestRoute, 70
+EXPORT STDCALL, GetCurrentThreadCompartmentId, 71
+EXPORT STDCALL, GetExtendedTcpTable, 72
+EXPORT STDCALL, GetExtendedUdpTable, 73
+EXPORT STDCALL, GetFriendlyIfIndex, 74
+EXPORT STDCALL, GetIcmpStatistics, 75
+EXPORT STDCALL, GetIcmpStatisticsEx, 76
+EXPORT STDCALL, GetIfEntry2, 77
+EXPORT STDCALL, GetIfEntry, 78
+EXPORT STDCALL, GetIfStackTable, 79
+EXPORT STDCALL, GetIfTable2, 80
+EXPORT STDCALL, GetIfTable2Ex, 81
+EXPORT STDCALL, GetIfTable, 82
+EXPORT STDCALL, GetInterfaceInfo, 83
+EXPORT STDCALL, GetInvertedIfStackTable, 84
+EXPORT STDCALL, GetIpAddrTable, 85
+EXPORT STDCALL, GetIpErrorString, 86
+EXPORT STDCALL, GetIpForwardEntry2, 87
+EXPORT STDCALL, GetIpForwardTable2, 88
+EXPORT STDCALL, GetIpForwardTable, 89
+EXPORT STDCALL, GetIpInterfaceEntry, 90
+EXPORT STDCALL, GetIpInterfaceTable, 91
+EXPORT STDCALL, GetIpNetEntry2, 92
+EXPORT STDCALL, GetIpNetTable2, 93
+EXPORT STDCALL, GetIpNetTable, 94
+EXPORT STDCALL, GetIpPathEntry, 95
+EXPORT STDCALL, GetIpPathTable, 96
+EXPORT STDCALL, GetIpStatistics, 97
+EXPORT STDCALL, GetIpStatisticsEx, 98
+EXPORT STDCALL, GetMulticastIpAddressEntry, 99
+EXPORT STDCALL, GetMulticastIpAddressTable, 100
+EXPORT STDCALL, GetNetworkInformation, 101
+EXPORT STDCALL, GetNetworkParams, 102
+EXPORT STDCALL, GetNumberOfInterfaces, 103
+EXPORT STDCALL, GetOwnerModuleFromPidAndInfo, 104
+EXPORT STDCALL, GetOwnerModuleFromTcp6Entry, 105
+EXPORT STDCALL, GetOwnerModuleFromTcpEntry, 106
+EXPORT STDCALL, GetOwnerModuleFromUdp6Entry, 107
+EXPORT STDCALL, GetOwnerModuleFromUdpEntry, 108
+EXPORT STDCALL, GetPerAdapterInfo, 109
+EXPORT STDCALL, GetPerTcp6ConnectionEStats, 110
+EXPORT STDCALL, GetPerTcp6ConnectionStats, 111
+EXPORT STDCALL, GetPerTcpConnectionEStats, 112
+EXPORT STDCALL, GetPerTcpConnectionStats, 113
+EXPORT STDCALL, GetRTTAndHopCount, 114
+EXPORT STDCALL, GetSessionCompartmentId, 115
+EXPORT STDCALL, GetTcp6Table2, 116
+EXPORT STDCALL, GetTcp6Table, 117
+EXPORT STDCALL, GetTcpStatistics, 118
+EXPORT STDCALL, GetTcpStatisticsEx, 119
+EXPORT STDCALL, GetTcpTable2, 120
+EXPORT STDCALL, GetTcpTable, 121
+EXPORT STDCALL, GetTeredoPort, 122
+EXPORT STDCALL, GetUdp6Table, 123
+EXPORT STDCALL, GetUdpStatistics, 124
+EXPORT STDCALL, GetUdpStatisticsEx, 125
+EXPORT STDCALL, GetUdpTable, 126
+EXPORT STDCALL, GetUniDirectionalAdapterInfo, 127
+EXPORT STDCALL, GetUnicastIpAddressEntry, 128
+EXPORT STDCALL, GetUnicastIpAddressTable, 129
+EXPORT STDCALL, Icmp6CreateFile, 130
+EXPORT STDCALL, Icmp6ParseReplies, 131
+EXPORT STDCALL, Icmp6SendEcho2, 132
+EXPORT STDCALL, IcmpCloseHandle, 133
+EXPORT STDCALL, IcmpCreateFile, 134
+EXPORT STDCALL, IcmpParseReplies, 135
+EXPORT STDCALL, IcmpSendEcho2, 136
+EXPORT STDCALL, IcmpSendEcho2Ex, 137
+EXPORT STDCALL, IcmpSendEcho, 138
+EXPORT STDCALL, InitializeIpForwardEntry, 139
+EXPORT STDCALL, InitializeIpInterfaceEntry, 140
+EXPORT STDCALL, InitializeUnicastIpAddressEntry, 141
+EXPORT STDCALL, InternalCleanupPersistentStore, 142
+EXPORT STDCALL, InternalCreateAnycastIpAddressEntry, 143
+EXPORT STDCALL, InternalCreateIpForwardEntry2, 144
+EXPORT STDCALL, InternalCreateIpForwardEntry, 145
+EXPORT STDCALL, InternalCreateIpNetEntry2, 146
+EXPORT STDCALL, InternalCreateIpNetEntry, 147
+EXPORT STDCALL, InternalCreateUnicastIpAddressEntry, 148
+EXPORT STDCALL, InternalDeleteAnycastIpAddressEntry, 149
+EXPORT STDCALL, InternalDeleteIpForwardEntry2, 150
+EXPORT STDCALL, InternalDeleteIpForwardEntry, 151
+EXPORT STDCALL, InternalDeleteIpNetEntry2, 152
+EXPORT STDCALL, InternalDeleteIpNetEntry, 153
+EXPORT STDCALL, InternalDeleteUnicastIpAddressEntry, 154
+EXPORT STDCALL, InternalFindInterfaceByAddress, 155
+EXPORT STDCALL, InternalGetAnycastIpAddressEntry, 156
+EXPORT STDCALL, InternalGetAnycastIpAddressTable, 157
+EXPORT STDCALL, InternalGetForwardIpTable2, 158
+EXPORT STDCALL, InternalGetIfEntry2, 159
+EXPORT STDCALL, InternalGetIfTable2, 160
+EXPORT STDCALL, InternalGetIfTable, 161
+EXPORT STDCALL, InternalGetIpAddrTable, 162
+EXPORT STDCALL, InternalGetIpForwardEntry2, 163
+EXPORT STDCALL, InternalGetIpForwardTable, 164
+EXPORT STDCALL, InternalGetIpInterfaceEntry, 165
+EXPORT STDCALL, InternalGetIpInterfaceTable, 166
+EXPORT STDCALL, InternalGetIpNetEntry2, 167
+EXPORT STDCALL, InternalGetIpNetTable2, 168
+EXPORT STDCALL, InternalGetIpNetTable, 169
+EXPORT STDCALL, InternalGetMulticastIpAddressEntry, 170
+EXPORT STDCALL, InternalGetMulticastIpAddressTable, 171
+EXPORT STDCALL, InternalGetTcp6Table2, 172
+EXPORT STDCALL, InternalGetTcp6TableWithOwnerModule, 173
+EXPORT STDCALL, InternalGetTcp6TableWithOwnerPid, 174
+EXPORT STDCALL, InternalGetTcpTable2, 175
+EXPORT STDCALL, InternalGetTcpTable, 176
+EXPORT STDCALL, InternalGetTcpTableEx, 177
+EXPORT STDCALL, InternalGetTcpTableWithOwnerModule, 178
+EXPORT STDCALL, InternalGetTcpTableWithOwnerPid, 179
+EXPORT STDCALL, InternalGetTunnelPhysicalAdapter, 180
+EXPORT STDCALL, InternalGetUdp6TableWithOwnerModule, 181
+EXPORT STDCALL, InternalGetUdp6TableWithOwnerPid, 182
+EXPORT STDCALL, InternalGetUdpTable, 183
+EXPORT STDCALL, InternalGetUdpTableEx, 184
+EXPORT STDCALL, InternalGetUdpTableWithOwnerModule, 185
+EXPORT STDCALL, InternalGetUdpTableWithOwnerPid, 186
+EXPORT STDCALL, InternalGetUnicastIpAddressEntry, 187
+EXPORT STDCALL, InternalGetUnicastIpAddressTable, 188
+EXPORT STDCALL, InternalSetIfEntry, 189
+EXPORT STDCALL, InternalSetIpForwardEntry2, 190
+EXPORT STDCALL, InternalSetIpForwardEntry, 191
+EXPORT STDCALL, InternalSetIpInterfaceEntry, 192
+EXPORT STDCALL, InternalSetIpNetEntry2, 193
+EXPORT STDCALL, InternalSetIpNetEntry, 194
+EXPORT STDCALL, InternalSetIpStats, 195
+EXPORT STDCALL, InternalSetTcpEntry, 196
+EXPORT STDCALL, InternalSetTeredoPort, 197
+EXPORT STDCALL, InternalSetUnicastIpAddressEntry, 198
+EXPORT STDCALL, IpReleaseAddress, 199
+EXPORT STDCALL, IpRenewAddress, 200
+EXPORT STDCALL, LookupPersistentTcpPortReservation, 201
+EXPORT STDCALL, LookupPersistentUdpPortReservation, 202
+EXPORT STDCALL, NTPTimeToNTFileTime, 203
+EXPORT STDCALL, NTTimeToNTPTime, 204
+EXPORT STDCALL, NhGetGuidFromInterfaceName, 205
+EXPORT STDCALL, NhGetInterfaceDescriptionFromGuid, 206
+EXPORT STDCALL, NhGetInterfaceNameFromDeviceGuid, 207
+EXPORT STDCALL, NhGetInterfaceNameFromGuid, 208
+EXPORT STDCALL, NhpAllocateAndGetInterfaceInfoFromStack, 209
+EXPORT STDCALL, NotifyAddrChange, 210
+EXPORT STDCALL, NotifyIpInterfaceChange, 211
+EXPORT STDCALL, NotifyRouteChange2, 212
+EXPORT STDCALL, NotifyRouteChange, 213
+EXPORT STDCALL, NotifyStableUnicastIpAddressTable, 214
+EXPORT STDCALL, NotifyTeredoPortChange, 215
+EXPORT STDCALL, NotifyUnicastIpAddressChange, 216
+EXPORT STDCALL, ParseNetworkString, 217
+EXPORT STDCALL, PfAddFiltersToInterface, 218
+EXPORT STDCALL, PfAddGlobalFilterToInterface, 219
+EXPORT STDCALL, PfBindInterfaceToIPAddress, 220
+EXPORT STDCALL, PfBindInterfaceToIndex, 221
+EXPORT STDCALL, PfCreateInterface, 222
+EXPORT STDCALL, PfDeleteInterface, 223
+EXPORT STDCALL, PfDeleteLog, 224
+EXPORT STDCALL, PfGetInterfaceStatistics, 225
+EXPORT STDCALL, PfMakeLog, 226
+EXPORT STDCALL, PfRebindFilters, 227
+EXPORT STDCALL, PfRemoveFilterHandles, 228
+EXPORT STDCALL, PfRemoveFiltersFromInterface, 229
+EXPORT STDCALL, PfRemoveGlobalFilterFromInterface, 230
+EXPORT STDCALL, PfSetLogBuffer, 231
+EXPORT STDCALL, PfTestPacket, 232
+EXPORT STDCALL, PfUnBindInterface, 233
+EXPORT STDCALL, ResolveIpNetEntry2, 234
+EXPORT STDCALL, ResolveNeighbor, 235
+EXPORT STDCALL, RestoreMediaSense, 236
+EXPORT STDCALL, SendARP, 237
+EXPORT STDCALL, SetAdapterIpAddress, 238
+EXPORT STDCALL, SetCurrentThreadCompartmentId, 239
+EXPORT STDCALL, SetIfEntry, 240
+EXPORT STDCALL, SetIpForwardEntry2, 241
+EXPORT STDCALL, SetIpForwardEntry, 242
+EXPORT STDCALL, SetIpInterfaceEntry, 243
+EXPORT STDCALL, SetIpNetEntry2, 244
+EXPORT STDCALL, SetIpNetEntry, 245
+EXPORT STDCALL, SetIpStatistics, 246
+EXPORT STDCALL, SetIpStatisticsEx, 247
+EXPORT STDCALL, SetIpTTL, 248
+EXPORT STDCALL, SetNetworkInformation, 249
+EXPORT STDCALL, SetPerTcp6ConnectionEStats, 250
+EXPORT STDCALL, SetPerTcp6ConnectionStats, 251
+EXPORT STDCALL, SetPerTcpConnectionEStats, 252
+EXPORT STDCALL, SetPerTcpConnectionStats, 253
+EXPORT STDCALL, SetSessionCompartmentId, 254
+EXPORT STDCALL, SetTcpEntry, 255
+EXPORT STDCALL, SetUnicastIpAddressEntry, 256
+EXPORT STDCALL, UnenableRouter, 257
+EXPORT STDCALL, do_echo_rep, 258
+EXPORT STDCALL, do_echo_req, 259
+EXPORT STDCALL, if_indextoname, 260
+EXPORT STDCALL, if_nametoindex, 261
+EXPORT STDCALL, register_icmp, 262
 
 SEH_handler PROC
         ; empty handler

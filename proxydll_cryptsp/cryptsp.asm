@@ -1,5 +1,5 @@
 IFNDEF x64
-        .MODEL FLAT, STDCALL
+        .MODEL FLAT
         .SAFESEH SEH_handler
 ENDIF
 
@@ -11,80 +11,90 @@ ELSE
         EXTERN proxydll_find_function:PROC
 ENDIF
 
-export MACRO name, x, y
-IFNDEF x64 AND x NE 0
-    name PROC
-            INVOKE proxydll_find_function, x
-            test eax, eax
-            jz bye
+EXPORT32 MACRO langtype:REQ, procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFNDEF x64
+        procname PROC langtype
+            INVOKE proxydll_find_function, ordinal
             jmp dword ptr eax
-    bye:
-            ret
-    name ENDP
-ELSEIFDEF x64 AND y NE 0
-    name PROC
-            push rcx
-            push rdx
-            push r8
-            push r9
-            sub rsp, 28h
-            mov rcx, y
-            call proxydll_find_function
-            add rsp, 28h
-            pop r9
-            pop r8
-            pop rdx
-            pop rcx
-            test rax, rax
-            jz bye
-            jmp qword ptr rax
-    bye:    
-            ret
-    name ENDP
-ENDIF
+        procname ENDP
+    ENDIF
 ENDM
 
-export CheckSignatureInFile, 1, 1
-export CryptAcquireContextA, 2, 2
-export CryptAcquireContextW, 3, 3
-export CryptContextAddRef, 4, 4
-export CryptCreateHash, 5, 5
-export CryptDecrypt, 6, 6
-export CryptDeriveKey, 7, 7
-export CryptDestroyHash, 8, 8
-export CryptDestroyKey, 9, 9
-export CryptDuplicateHash, 10, 10
-export CryptDuplicateKey, 11, 11
-export CryptEncrypt, 12, 12
-export CryptEnumProviderTypesA, 13, 13
-export CryptEnumProviderTypesW, 14, 14
-export CryptEnumProvidersA, 15, 15
-export CryptEnumProvidersW, 16, 16
-export CryptExportKey, 17, 17
-export CryptGenKey, 18, 18
-export CryptGenRandom, 19, 19
-export CryptGetDefaultProviderA, 20, 20
-export CryptGetDefaultProviderW, 21, 21
-export CryptGetHashParam, 22, 22
-export CryptGetKeyParam, 23, 23
-export CryptGetProvParam, 24, 24
-export CryptGetUserKey, 25, 25
-export CryptHashData, 26, 26
-export CryptHashSessionKey, 27, 27
-export CryptImportKey, 28, 28
-export CryptReleaseContext, 29, 29
-export CryptSetHashParam, 30, 30
-export CryptSetKeyParam, 31, 31
-export CryptSetProvParam, 32, 32
-export CryptSetProviderA, 33, 33
-export CryptSetProviderExA, 34, 34
-export CryptSetProviderExW, 35, 35
-export CryptSetProviderW, 36, 36
-export CryptSignHashA, 37, 37
-export CryptSignHashW, 38, 38
-export CryptVerifySignatureA, 39, 39
-export CryptVerifySignatureW, 40, 40
-export SystemFunction035, 41, 41
+EXPORT64 MACRO procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFDEF x64
+        procname PROC
+                push rcx
+                push rdx
+                push r8
+                push r9
+                sub rsp, 28h
+                mov rcx, ordinal
+                call proxydll_find_function
+                add rsp, 28h
+                pop r9
+                pop r8
+                pop rdx
+                pop rcx
+                jmp qword ptr rax
+        procname ENDP
+    ENDIF
+ENDM
+
+EXPORT MACRO langtype:REQ, procname:REQ, ordinal1:REQ, ordinal2
+    EXPORT32 langtype, procname, ordinal1
+    
+    IFB <ordinal2>
+        EXPORT64 procname, ordinal1
+    ELSE
+        EXPORT64 procname, ordinal2
+    ENDIF
+ENDM
+
+EXPORT STDCALL, CheckSignatureInFile, 1
+EXPORT STDCALL, CryptAcquireContextA, 2
+EXPORT STDCALL, CryptAcquireContextW, 3
+EXPORT STDCALL, CryptContextAddRef, 4
+EXPORT STDCALL, CryptCreateHash, 5
+EXPORT STDCALL, CryptDecrypt, 6
+EXPORT STDCALL, CryptDeriveKey, 7
+EXPORT STDCALL, CryptDestroyHash, 8
+EXPORT STDCALL, CryptDestroyKey, 9
+EXPORT STDCALL, CryptDuplicateHash, 10
+EXPORT STDCALL, CryptDuplicateKey, 11
+EXPORT STDCALL, CryptEncrypt, 12
+EXPORT STDCALL, CryptEnumProviderTypesA, 13
+EXPORT STDCALL, CryptEnumProviderTypesW, 14
+EXPORT STDCALL, CryptEnumProvidersA, 15
+EXPORT STDCALL, CryptEnumProvidersW, 16
+EXPORT STDCALL, CryptExportKey, 17
+EXPORT STDCALL, CryptGenKey, 18
+EXPORT STDCALL, CryptGenRandom, 19
+EXPORT STDCALL, CryptGetDefaultProviderA, 20
+EXPORT STDCALL, CryptGetDefaultProviderW, 21
+EXPORT STDCALL, CryptGetHashParam, 22
+EXPORT STDCALL, CryptGetKeyParam, 23
+EXPORT STDCALL, CryptGetProvParam, 24
+EXPORT STDCALL, CryptGetUserKey, 25
+EXPORT STDCALL, CryptHashData, 26
+EXPORT STDCALL, CryptHashSessionKey, 27
+EXPORT STDCALL, CryptImportKey, 28
+EXPORT STDCALL, CryptReleaseContext, 29
+EXPORT STDCALL, CryptSetHashParam, 30
+EXPORT STDCALL, CryptSetKeyParam, 31
+EXPORT STDCALL, CryptSetProvParam, 32
+EXPORT STDCALL, CryptSetProviderA, 33
+EXPORT STDCALL, CryptSetProviderExA, 34
+EXPORT STDCALL, CryptSetProviderExW, 35
+EXPORT STDCALL, CryptSetProviderW, 36
+EXPORT STDCALL, CryptSignHashA, 37
+EXPORT STDCALL, CryptSignHashW, 38
+EXPORT STDCALL, CryptVerifySignatureA, 39
+EXPORT STDCALL, CryptVerifySignatureW, 40
+EXPORT STDCALL, SystemFunction035, 41
 
 SEH_handler PROC
         ; empty handler

@@ -1,5 +1,5 @@
 IFNDEF x64
-        .MODEL FLAT, STDCALL
+        .MODEL FLAT
         .SAFESEH SEH_handler
 ENDIF
 
@@ -11,100 +11,110 @@ ELSE
         EXTERN proxydll_find_function:PROC
 ENDIF
 
-export MACRO name, x, y
-IFNDEF x64 AND x NE 0
-    name PROC
-            INVOKE proxydll_find_function, x
-            test eax, eax
-            jz bye
+EXPORT32 MACRO langtype:REQ, procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFNDEF x64
+        procname PROC langtype
+            INVOKE proxydll_find_function, ordinal
             jmp dword ptr eax
-    bye:
-            ret
-    name ENDP
-ELSEIFDEF x64 AND y NE 0
-    name PROC
-            push rcx
-            push rdx
-            push r8
-            push r9
-            sub rsp, 28h
-            mov rcx, y
-            call proxydll_find_function
-            add rsp, 28h
-            pop r9
-            pop r8
-            pop rdx
-            pop rcx
-            test rax, rax
-            jz bye
-            jmp qword ptr rax
-    bye:    
-            ret
-    name ENDP
-ENDIF
+        procname ENDP
+    ENDIF
 ENDM
 
-export WTSCloseServer, 1, 1
-export WTSConnectSessionA, 2, 2
-export WTSConnectSessionW, 3, 3
-export WTSCreateListenerA, 4, 4
-export WTSCreateListenerW, 5, 5
-export WTSDisconnectSession, 6, 6
-export WTSEnumerateListenersA, 7, 7
-export WTSEnumerateListenersW, 8, 8
-export WTSEnumerateProcessesA, 9, 9
-export WTSEnumerateProcessesExA, 10, 10
-export WTSEnumerateProcessesExW, 11, 11
-export WTSEnumerateProcessesW, 12, 12
-export WTSEnumerateServersA, 13, 13
-export WTSEnumerateServersW, 14, 14
-export WTSEnumerateSessionsA, 15, 15
-export WTSEnumerateSessionsExA, 16, 16
-export WTSEnumerateSessionsExW, 17, 17
-export WTSEnumerateSessionsW, 18, 18
-export WTSFreeMemory, 19, 19
-export WTSFreeMemoryExA, 20, 20
-export WTSFreeMemoryExW, 21, 21
-export WTSGetListenerSecurityA, 22, 22
-export WTSGetListenerSecurityW, 23, 23
-export WTSLogoffSession, 24, 24
-export WTSOpenServerA, 25, 25
-export WTSOpenServerExA, 26, 26
-export WTSOpenServerExW, 27, 27
-export WTSOpenServerW, 28, 28
-export WTSQueryListenerConfigA, 29, 29
-export WTSQueryListenerConfigW, 30, 30
-export WTSQuerySessionInformationA, 31, 31
-export WTSQuerySessionInformationW, 32, 32
-export WTSQueryUserConfigA, 33, 33
-export WTSQueryUserConfigW, 34, 34
-export WTSQueryUserToken, 35, 35
-export WTSRegisterSessionNotification, 36, 36
-export WTSRegisterSessionNotificationEx, 37, 37
-export WTSSendMessageA, 38, 38
-export WTSSendMessageW, 39, 39
-export WTSSetListenerSecurityA, 40, 40
-export WTSSetListenerSecurityW, 41, 41
-export WTSSetSessionInformationA, 42, 42
-export WTSSetSessionInformationW, 43, 43
-export WTSSetUserConfigA, 44, 44
-export WTSSetUserConfigW, 45, 45
-export WTSShutdownSystem, 46, 46
-export WTSStartRemoteControlSessionA, 47, 47
-export WTSStartRemoteControlSessionW, 48, 48
-export WTSStopRemoteControlSession, 49, 49
-export WTSTerminateProcess, 50, 50
-export WTSUnRegisterSessionNotification, 51, 51
-export WTSUnRegisterSessionNotificationEx, 52, 52
-export WTSVirtualChannelClose, 53, 53
-export WTSVirtualChannelOpen, 54, 54
-export WTSVirtualChannelOpenEx, 55, 55
-export WTSVirtualChannelPurgeInput, 56, 56
-export WTSVirtualChannelPurgeOutput, 57, 57
-export WTSVirtualChannelQuery, 58, 58
-export WTSVirtualChannelRead, 59, 59
-export WTSVirtualChannelWrite, 60, 60
-export WTSWaitSystemEvent, 61, 61
+EXPORT64 MACRO procname:REQ, ordinal:REQ
+    .ERRE ordinal
+
+    IFDEF x64
+        procname PROC
+                push rcx
+                push rdx
+                push r8
+                push r9
+                sub rsp, 28h
+                mov rcx, ordinal
+                call proxydll_find_function
+                add rsp, 28h
+                pop r9
+                pop r8
+                pop rdx
+                pop rcx
+                jmp qword ptr rax
+        procname ENDP
+    ENDIF
+ENDM
+
+EXPORT MACRO langtype:REQ, procname:REQ, ordinal1:REQ, ordinal2
+    EXPORT32 langtype, procname, ordinal1
+    
+    IFB <ordinal2>
+        EXPORT64 procname, ordinal1
+    ELSE
+        EXPORT64 procname, ordinal2
+    ENDIF
+ENDM
+
+EXPORT STDCALL, WTSCloseServer, 1
+EXPORT STDCALL, WTSConnectSessionA, 2
+EXPORT STDCALL, WTSConnectSessionW, 3
+EXPORT STDCALL, WTSCreateListenerA, 4
+EXPORT STDCALL, WTSCreateListenerW, 5
+EXPORT STDCALL, WTSDisconnectSession, 6
+EXPORT STDCALL, WTSEnumerateListenersA, 7
+EXPORT STDCALL, WTSEnumerateListenersW, 8
+EXPORT STDCALL, WTSEnumerateProcessesA, 9
+EXPORT STDCALL, WTSEnumerateProcessesExA, 10
+EXPORT STDCALL, WTSEnumerateProcessesExW, 11
+EXPORT STDCALL, WTSEnumerateProcessesW, 12
+EXPORT STDCALL, WTSEnumerateServersA, 13
+EXPORT STDCALL, WTSEnumerateServersW, 14
+EXPORT STDCALL, WTSEnumerateSessionsA, 15
+EXPORT STDCALL, WTSEnumerateSessionsExA, 16
+EXPORT STDCALL, WTSEnumerateSessionsExW, 17
+EXPORT STDCALL, WTSEnumerateSessionsW, 18
+EXPORT STDCALL, WTSFreeMemory, 19
+EXPORT STDCALL, WTSFreeMemoryExA, 20
+EXPORT STDCALL, WTSFreeMemoryExW, 21
+EXPORT STDCALL, WTSGetListenerSecurityA, 22
+EXPORT STDCALL, WTSGetListenerSecurityW, 23
+EXPORT STDCALL, WTSLogoffSession, 24
+EXPORT STDCALL, WTSOpenServerA, 25
+EXPORT STDCALL, WTSOpenServerExA, 26
+EXPORT STDCALL, WTSOpenServerExW, 27
+EXPORT STDCALL, WTSOpenServerW, 28
+EXPORT STDCALL, WTSQueryListenerConfigA, 29
+EXPORT STDCALL, WTSQueryListenerConfigW, 30
+EXPORT STDCALL, WTSQuerySessionInformationA, 31
+EXPORT STDCALL, WTSQuerySessionInformationW, 32
+EXPORT STDCALL, WTSQueryUserConfigA, 33
+EXPORT STDCALL, WTSQueryUserConfigW, 34
+EXPORT STDCALL, WTSQueryUserToken, 35
+EXPORT STDCALL, WTSRegisterSessionNotification, 36
+EXPORT STDCALL, WTSRegisterSessionNotificationEx, 37
+EXPORT STDCALL, WTSSendMessageA, 38
+EXPORT STDCALL, WTSSendMessageW, 39
+EXPORT STDCALL, WTSSetListenerSecurityA, 40
+EXPORT STDCALL, WTSSetListenerSecurityW, 41
+EXPORT STDCALL, WTSSetSessionInformationA, 42
+EXPORT STDCALL, WTSSetSessionInformationW, 43
+EXPORT STDCALL, WTSSetUserConfigA, 44
+EXPORT STDCALL, WTSSetUserConfigW, 45
+EXPORT STDCALL, WTSShutdownSystem, 46
+EXPORT STDCALL, WTSStartRemoteControlSessionA, 47
+EXPORT STDCALL, WTSStartRemoteControlSessionW, 48
+EXPORT STDCALL, WTSStopRemoteControlSession, 49
+EXPORT STDCALL, WTSTerminateProcess, 50
+EXPORT STDCALL, WTSUnRegisterSessionNotification, 51
+EXPORT STDCALL, WTSUnRegisterSessionNotificationEx, 52
+EXPORT STDCALL, WTSVirtualChannelClose, 53
+EXPORT STDCALL, WTSVirtualChannelOpen, 54
+EXPORT STDCALL, WTSVirtualChannelOpenEx, 55
+EXPORT STDCALL, WTSVirtualChannelPurgeInput, 56
+EXPORT STDCALL, WTSVirtualChannelPurgeOutput, 57
+EXPORT STDCALL, WTSVirtualChannelQuery, 58
+EXPORT STDCALL, WTSVirtualChannelRead, 59
+EXPORT STDCALL, WTSVirtualChannelWrite, 60
+EXPORT STDCALL, WTSWaitSystemEvent, 61
 
 SEH_handler PROC
         ; empty handler
