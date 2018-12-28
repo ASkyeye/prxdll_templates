@@ -10,6 +10,7 @@ PVOID __stdcall proxydll_find_function(WORD wOrdinal)
 {
         TCHAR Path[MAX_PATH];
         HMODULE hModule;
+        DWORD Base;
         DWORD Index;
         DWORD Count;
         PVOID temp;
@@ -18,11 +19,13 @@ PVOID __stdcall proxydll_find_function(WORD wOrdinal)
         DWORD *Names;
         WORD *NameOrdinals;
         LPCSTR ProcName;
+        WORD NameOrdinal;
 
         if ( !wOrdinal )
                 return NULL;
 
-        Index = wOrdinal - g_pExportDirectory->Base;
+        Base = g_pExportDirectory->Base;
+        Index = wOrdinal - Base;
         if ( Index >= g_pExportDirectory->NumberOfFunctions )
                 return NULL;
 
@@ -50,10 +53,12 @@ PVOID __stdcall proxydll_find_function(WORD wOrdinal)
                 ProcName = MAKEINTRESOURCEA(wOrdinal);
 
                 for ( DWORD i = 0; i < g_pExportDirectory->NumberOfNames; ++i ) {
-                        if ( wOrdinal != g_pExportDirectory->Base + NameOrdinals[i] )
+                        NameOrdinal = Base + NameOrdinals[i];
+                        if ( wOrdinal < NameOrdinal )
                                 continue;
-
-                        ProcName = OffsetToPointer(g_pImageBase, Names[i]);
+                        else if ( wOrdinal == NameOrdinal )
+                                ProcName = OffsetToPointer(g_pImageBase, Names[i]);
+                        break;
                 }
                 if ( (Result = GetProcAddress(hModule, ProcName))
                         && (temp = InterlockedCompareExchangePointer(&g_pPointers[Index], Result, NULL)) )
