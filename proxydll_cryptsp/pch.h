@@ -4,6 +4,7 @@
 // Windows Header Files:
 #include <windows.h>
 #include <tchar.h>
+#include <strsafe.h>
 
 // standard library headers
 #include <stdlib.h>

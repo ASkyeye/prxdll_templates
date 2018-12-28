@@ -30,7 +30,7 @@ PVOID __stdcall proxydll_find_function(WORD wOrdinal)
                 ModuleName = OffsetToPointer(g_pImageBase, g_pExportDirectory->Name);
                 Count = GetSystemDirectory(Path, _countof(Path));
 
-                if ( _stprintf_s(Path + Count, _countof(Path) - Count, _T("\\%hs"), ModuleName) == -1
+                if ( FAILED(StringCchPrintf(Path + Count, _countof(Path) - Count, _T("\\%hs"), ModuleName))
                         || !(hModule = LoadLibraryEx(Path, NULL, 0)) ) {
 
                         return NULL;
