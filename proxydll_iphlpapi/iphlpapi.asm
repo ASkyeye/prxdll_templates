@@ -1,23 +1,25 @@
-IFNDEF x64
-        .MODEL FLAT
-        .SAFESEH SEH_handler
+IFNDEF _M_X64
+    .MODEL FLAT
+    .SAFESEH SEH_handler
+ELSE
+    INCLUDE ksamd64.inc
 ENDIF
 
 .CODE
 
-IFNDEF x64
-        proxydll_find_function PROTO STDCALL, arg1:WORD
+IFNDEF _M_X64
+    proxydll_find_function PROTO STDCALL, arg1:WORD
 ELSE
-        EXTERN proxydll_find_function:PROC
+    EXTERN proxydll_find_function:PROC
 ENDIF
 
 EXPORT32 MACRO langtype:REQ, procname:REQ, ordinal:REQ
     .ERRE ordinal
 
-    IFNDEF x64
+    IFNDEF _M_X64
         procname PROC langtype
             INVOKE proxydll_find_function, ordinal
-            jmp dword ptr eax
+            jmp eax
         procname ENDP
     ENDIF
 ENDM
@@ -25,21 +27,26 @@ ENDM
 EXPORT64 MACRO procname:REQ, ordinal:REQ
     .ERRE ordinal
 
-    IFDEF x64
-        procname PROC
-                push rcx
-                push rdx
-                push r8
-                push r9
-                sub rsp, 28h
-                mov rcx, ordinal
-                call proxydll_find_function
-                add rsp, 28h
-                pop r9
-                pop r8
-                pop rdx
-                pop rcx
-                jmp qword ptr rax
+    IFDEF _M_X64
+        procname PROC FRAME
+            save_reg r9, 20h
+            save_reg r8, 18h
+            save_reg rdx, 10h
+            save_reg rcx, 8
+            alloc_stack 20h
+            END_PROLOGUE
+            
+            mov rcx, ordinal
+            call proxydll_find_function
+            
+            add rsp, 20h
+            mov rcx, [rsp+8]
+            mov rdx, [rsp+10h]
+            mov r8, [rsp+18h]
+            mov r9, [rsp+20h]
+
+            BEGIN_EPILOGUE
+            rex_jmp_reg rax
         procname ENDP
     ENDIF
 ENDM
