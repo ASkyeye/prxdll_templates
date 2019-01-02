@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -102,10 +101,5 @@ EXPORT STDCALL, CryptSignHashW, 38
 EXPORT STDCALL, CryptVerifySignatureA, 39
 EXPORT STDCALL, CryptVerifySignatureW, 40
 EXPORT STDCALL, SystemFunction035, 41
-
-SEH_handler PROC
-    ; empty handler
-    ret
-SEH_handler ENDP
 
 END

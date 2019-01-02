@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -323,10 +322,5 @@ EXPORT STDCALL, do_echo_req, 259
 EXPORT STDCALL, if_indextoname, 260
 EXPORT STDCALL, if_nametoindex, 261
 EXPORT STDCALL, register_icmp, 262
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -201,10 +200,5 @@ EXPORT STDCALL, _WinStationUpdateClientCachedCredentials, 137
 EXPORT STDCALL, _WinStationUpdateSettings, 138
 EXPORT STDCALL, _WinStationUpdateUserConfig, 139
 EXPORT STDCALL, _WinStationWaitForConnect, 140
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -91,10 +90,5 @@ EXPORT STDCALL, D3D10StateBlockMaskEnableCapture, 27
 EXPORT STDCALL, D3D10StateBlockMaskGetSetting, 28
 EXPORT STDCALL, D3D10StateBlockMaskIntersect, 29
 EXPORT STDCALL, D3D10StateBlockMaskUnion, 30
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -122,10 +121,5 @@ EXPORT STDCALL, WTSVirtualChannelQuery, 58
 EXPORT STDCALL, WTSVirtualChannelRead, 59
 EXPORT STDCALL, WTSVirtualChannelWrite, 60
 EXPORT STDCALL, WTSWaitSystemEvent, 61
-
-SEH_handler PROC
-    ; empty handler
-    ret
-SEH_handler ENDP
 
 END

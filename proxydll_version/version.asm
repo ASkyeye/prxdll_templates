@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -76,10 +75,5 @@ EXPORT STDCALL, VerLanguageNameA, 12
 EXPORT STDCALL, VerLanguageNameW, 13
 EXPORT STDCALL, VerQueryValueA, 14
 EXPORT STDCALL, VerQueryValueW, 15
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

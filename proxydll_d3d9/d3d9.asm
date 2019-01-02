@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -75,10 +74,5 @@ EXPORT STDCALL, DebugSetLevel, 11
 EXPORT STDCALL, DebugSetMute, 12
 EXPORT STDCALL, Direct3DCreate9, 13
 EXPORT STDCALL, Direct3DCreate9Ex, 14
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

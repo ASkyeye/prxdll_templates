@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -108,10 +107,5 @@ EXPORT STDCALL, D3DPerformance_BeginEvent, 44
 EXPORT STDCALL, D3DPerformance_EndEvent, 45
 EXPORT STDCALL, D3DPerformance_GetStatus, 46
 EXPORT STDCALL, D3DPerformance_SetMarker, 47
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END

@@ -1,6 +1,5 @@
 IFNDEF _M_X64
     .MODEL FLAT
-    .SAFESEH SEH_handler
 ELSE
     INCLUDE ksamd64.inc
 ENDIF
@@ -254,10 +253,5 @@ EXPORT STDCALL, waveOutUnprepareHeader, 191, 181
 EXPORT STDCALL, waveOutWrite, 192, 182
 EXPORT32 STDCALL, wid32Message, 193
 EXPORT32 STDCALL, wod32Message, 194
-
-SEH_handler PROC
-        ; empty handler
-        ret
-SEH_handler ENDP
 
 END
