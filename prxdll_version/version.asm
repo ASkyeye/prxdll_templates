@@ -43,7 +43,7 @@ PRX_EXPORT64 macro procname:req, ordinal:req
             save_reg r8, 18h
             save_reg rdx, 10h
             save_reg rcx, 8
-            alloc_stack 20h
+            alloc_stack 28h
             END_PROLOGUE
             
             mov rax, procname&_ptr
@@ -54,7 +54,7 @@ PRX_EXPORT64 macro procname:req, ordinal:req
                 call prx_find_function
 
         skip_find:
-            add rsp, 20h
+            add rsp, 28h
             mov rcx, [rsp + 8]
             mov rdx, [rsp + 10h]
             mov r8, [rsp + 18h]
